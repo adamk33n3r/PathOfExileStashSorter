@@ -8,6 +8,10 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using AForge;
+using AForge.Imaging;
+using AForge.Imaging.Filters;
+using AForge.Math.Geometry;
 using PoeStashSorterModels;
 using Image = System.Drawing.Image;
 
@@ -104,96 +108,44 @@ namespace POEStashSorterModels
                     g.CopyFromScreen(rect.Left, rect.Top, 0, 0, img.Size, CopyPixelOperation.SourceCopy);
                 }
                 //img.Save("c:\\444.png", ImageFormat.Png);
+                var colorFilter = new ColorFiltering();
+                colorFilter.Red = new IntRange(0, 62);
+                colorFilter.Green = new IntRange(0, 62);
+                colorFilter.Blue = new IntRange(0, 62);
+                colorFilter.FillOutsideRange = false;
 
-                var points = new List<PointColor>();
-                for (int y = (int)(img.Height * 0.1); y < img.Height * 0.8; y++)
+                colorFilter.ApplyInPlace(img);
+                
+                var blobCounter = new BlobCounter();
+
+                blobCounter.FilterBlobs = true;
+                blobCounter.MinHeight = 50;
+                blobCounter.MinWidth = 50;
+
+                blobCounter.ProcessImage(img);
+                Blob[] blobs = blobCounter.GetObjectsInformation();
+                var shapeChecker = new SimpleShapeChecker();
+                foreach (var blob in blobs)
                 {
-                    for (int x = 0; x < img.Width / 2; x++)
+                    var edgePoints = blobCounter.GetBlobsEdgePoints(blob);
+                    List<IntPoint> cornerPoints;
+                    
+                    if (shapeChecker.IsQuadrilateral(edgePoints, out cornerPoints))
                     {
-                        var color = img.GetPixel(x, y);
-                        float hue = color.GetHue();
-                        if (hue < 30 && color.GetBrightness() > 0.10)
+                        if (shapeChecker.CheckPolygonSubType(cornerPoints) == PolygonSubType.Square)
                         {
-                            points.Add(new PointColor(x, y, (int)hue));
+                            var rectangle = new Rectangle(cornerPoints[0].X, cornerPoints[1].Y, cornerPoints[1].X - cornerPoints[0].X, cornerPoints[2].Y - cornerPoints[1].Y);
+                            return rectangle;
+                            /*Graphics g = Graphics.FromImage(img);
+                            g.DrawRectangle(new Pen(Color.Red), rectangle);
+                            //g.DrawPolygon(new Pen(Color.Red, 5.0f), Points.ToArray());
+                            img.Save("с:/result.png");*/
                         }
                     }
                 }
-
-                Func<PointColor[], Func<int, bool>, bool> IsLineBody = (ordered, isChain) =>
-                {
-                    const int ACCURACY = 300;
-                    int maxChain = 0;
-                    int curChain = 0;
-                    for (int i = 0; i < ordered.Length - 1; i++)
-                    {
-                        if (isChain(i) && Math.Abs(ordered[i].Hue - ordered[i + 1].Hue) < 10)
-                            curChain++;
-                        else
-                        {
-                            if (curChain > maxChain)
-                                maxChain = curChain;
-                            curChain = 0;
-                        }
-                    }
-                    return Math.Max(curChain, maxChain) > ACCURACY;
-                };
-
-
-                Func<IGrouping<int, PointColor>, bool> IsLineY = group =>
-                {
-                    var orderedByY = group.OrderBy(y => y.Y).ToArray();
-                    return IsLineBody(orderedByY, i => orderedByY[i].Y == orderedByY[i + 1].Y - 1);
-
-                };
-
-                Func<IGrouping<int, PointColor>, bool> IsLineX = group =>
-                {
-                    var orderedByX = group.OrderBy(y => y.X).ToArray();
-                    return IsLineBody(orderedByX, i => orderedByX[i].X == orderedByX[i + 1].X - 1);
-                };
-
-                Func<List<int>, List<List<int>>> Grouping = list =>
-                {
-                    var collection = new List<List<int>>();
-                    var temp = new List<int>();
-                    if (list.Count > 0)
-                        temp.Add(list[0]);
-                    for (int i = 1; i < list.Count; i++)
-                    {
-                        if (list[i - 1] + 1 == list[i])
-                        {
-                            temp.Add(list[i]);
-                        }
-                        else
-                        {
-                            collection.Add(temp);
-                            temp = new List<int>();
-                            temp.Add(list[i]);
-                        }
-                    }
-                    collection.Add(temp);
-                    return collection;
-                };
-
-                var xBorders =
-                    Grouping(
-                        points.GroupBy(y => y.X)
-                            .Where(y => IsLineY(y))
-                            .Select(y => y.Key)
-                            .Where(y => y != 0)
-                            .OrderBy(y => y)
-                            .ToList());
-                var yBorders =
-                    Grouping(points.GroupBy(y => y.Y).Where(y => IsLineX(y)).Select(y => y.Key).OrderBy(y => y).ToList());
-
-
-                if (xBorders.Count < 2 || yBorders.Count < 2)
-                    throw new Exception("Stash hasn't found");
-
-                var xx = xBorders[0].Max();
-                var yy = yBorders[0].Max();
-                return new Rectangle(xx, yy, xBorders[1].Min() - xx, yBorders[1].Min() - yy);
+             
             }
+            throw new Exception("Stash hasn't found");
         }
 
         public void StartSorting(Tab unsortedTab, Tab sortedTab, InterruptEvent interruptEvent)
