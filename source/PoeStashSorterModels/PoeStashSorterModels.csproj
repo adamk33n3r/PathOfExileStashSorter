@@ -105,6 +105,7 @@
     <Compile Include="Servers\GarenaCisServer.cs" />
     <Compile Include="Servers\GarenaSgServer.cs" />
     <Compile Include="Servers\GarenaThServer.cs" />
+    <Compile Include="Servers\GarenaTWServer.cs" />
     <Compile Include="Servers\GeneralServer.cs" />
     <Compile Include="Servers\Server.cs" />
     <Compile Include="Settings.cs" />
