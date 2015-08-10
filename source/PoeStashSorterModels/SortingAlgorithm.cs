@@ -1,22 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.Linq;
-using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
 using AForge;
 using AForge.Imaging;
 using AForge.Imaging.Filters;
 using AForge.Math.Geometry;
 using PoeStashSorterModels;
-using Image = System.Drawing.Image;
+
 
 namespace POEStashSorterModels
 {
+    public class StartSortingParams
+    {
+        public StartSortingParams(Tab unsortedTab, Tab sortedTab, InterruptEvent interruptEvent, StashPosSize stashPosSize)
+        {
+            UnsortedTab = unsortedTab;
+            SortedTab = sortedTab;
+            InterruptEvent = interruptEvent;
+            StashPosSize = stashPosSize;
+        }
+
+        public Tab UnsortedTab { get; }
+        public Tab SortedTab { get; }
+        public InterruptEvent InterruptEvent { get; }
+        public StashPosSize StashPosSize { get; }
+    }
+
     public abstract class SortingAlgorithm
     {
         private static bool isSorting = false;
@@ -68,13 +81,27 @@ namespace POEStashSorterModels
             return (SortingAlgorithm)Activator.CreateInstance(type);
         }
 
-        private void GetStashDimentions()
+        private void CalcStashDimentions(StartSortingParams sortingParams)
         {
             const int CELL_COUNT_X = 12;
             RECT rect = ApplicationHelper.PathOfExileDimentions;
-            //int width = rect.Right;
-            //int height = rect.Bottom;
-            var stashRectangle = GetStashRectangle(rect);
+
+            Rectangle stashRectangle;
+
+            if (!sortingParams.StashPosSize.Equals(default(StashPosSize)))
+            {
+                Func<RECT, bool> checkScreenSize = (r) => r.Right != sortingParams.StashPosSize.Widht && r.Bottom != sortingParams.StashPosSize.Height;
+                if (checkScreenSize(rect))
+                {
+                    ApplicationHelper.SetWindowSize(sortingParams.StashPosSize.Widht, sortingParams.StashPosSize.Height, ref rect);
+                    Task.Delay(3000).Wait();
+                    if (checkScreenSize(rect))
+                        throw new Exception("Failed to change screen resolution to " + sortingParams.StashPosSize);
+                }
+                stashRectangle = sortingParams.StashPosSize.Rect;
+            }
+            else
+                stashRectangle = GetStashRectangle(rect);
 
             cellHeight = (float)stashRectangle.Width / CELL_COUNT_X; // height * 0.0484f;
             cellWidth = cellHeight;
@@ -101,7 +128,7 @@ namespace POEStashSorterModels
 
         private static Rectangle GetStashRectangle(RECT rect)
         {
-            using (Bitmap img = new Bitmap(rect.Right, rect.Bottom))
+            using (Bitmap img = new Bitmap(rect.Right/2, rect.Bottom))
             {
                 using (Graphics g = Graphics.FromImage(img))
                 {
@@ -148,15 +175,15 @@ namespace POEStashSorterModels
             throw new Exception("Stash hasn't found");
         }
 
-        public void StartSorting(Tab unsortedTab, Tab sortedTab, InterruptEvent interruptEvent)
+        public void StartSorting(StartSortingParams sortingParams)
         {
             try
             {
                 ApplicationHelper.OpenPathOfExile();
-                List<Item> unsortedItems = unsortedTab.Items.Where(x => sortedTab.Items.Any(c => c.Id == x.Id && c.X == x.X && x.Y == c.Y) == false).ToList();
+                List<Item> unsortedItems = sortingParams.UnsortedTab.Items.Where(x => sortingParams.SortedTab.Items.Any(c => c.Id == x.Id && c.X == x.X && x.Y == c.Y) == false).ToList();
                 if (isSorting == false)
                 {
-                    GetStashDimentions();
+                    CalcStashDimentions(sortingParams);
                     isSorting = true;
 
                     Item unsortedItem = unsortedItems.FirstOrDefault();
@@ -168,11 +195,11 @@ namespace POEStashSorterModels
 
                         while (unsortedItem != null)
                         {
-                            if (interruptEvent.Isinterrupted)
+                            if (sortingParams.InterruptEvent.Isinterrupted)
                             {
                                 throw new Exception("Interrupted");
                             }
-                            Item sortedItem = sortedTab.Items.FirstOrDefault(x => x.Id == unsortedItem.Id);
+                            Item sortedItem = sortingParams.SortedTab.Items.FirstOrDefault(x => x.Id == unsortedItem.Id);
                             Vector2 unsortedPos = new Vector2(startPos.X + unsortedItem.X * cellWidth, startPos.Y + unsortedItem.Y * cellHeight);
 
                             if (selectGem)

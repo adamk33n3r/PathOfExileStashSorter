@@ -19,6 +19,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using PoeStashSorterModels;
+using Rectangle=System.Drawing.Rectangle;
 
 namespace POEStashSorter
 {
@@ -47,6 +48,7 @@ namespace POEStashSorter
             PopulateLeagueDDL();
             PopulateSpeedSlider();
             PopulateSortingDDL();
+            PopulateStashSize();
 
             if (ddlLeague.Items.Count == 0)
             {
@@ -111,6 +113,26 @@ namespace POEStashSorter
             sliderSpeed.Value = Settings.Instance.Speed;
         }
 
+        private void PopulateStashSize()
+        {
+            List<StashPosSize> list = new List<StashPosSize>
+            {
+                new StashPosSize(0, 0, new Rectangle (0, 0, 0,0)),
+                new StashPosSize(1600, 900, new Rectangle(12, 132, 540, 661)),
+                new StashPosSize(1499, 900, new Rectangle(11, 132, 506, 661)),
+                new StashPosSize(1366, 768, new Rectangle(10, 113, 461, 564)),
+                new StashPosSize(1360, 768, new Rectangle(10, 113, 459, 564)),
+                new StashPosSize(1280, 960, new Rectangle(13, 142, 578, 707)),
+                new StashPosSize(1280, 800, new Rectangle(10, 118, 480, 588)),
+                new StashPosSize(1280, 768, new Rectangle(10, 113, 461, 564)),
+                new StashPosSize(1280, 720, new Rectangle(9, 107, 434, 529)),
+                new StashPosSize(1024, 768, new Rectangle(10, 113, 461, 564)),
+                new StashPosSize(800, 600, new Rectangle(8, 88, 360, 441))
+              };
+            cbStashSize.ItemsSource = list;
+            cbStashSize.SelectedIndex = Settings.Instance.StashSizeID;
+        }
+        
         private void PopulateLeagueDDL()
         {
             ddlLeague.ItemsSource = PoeSorter.Leagues;
@@ -144,7 +166,8 @@ namespace POEStashSorter
             interruptEvent.Isinterrupted =  false;
             RegisterHotKey(handle, 9999, 0, ESCAPE);
             await Task.Delay(300);
-            await Task.Run(() => PoeSorter.StartSorting(interruptEvent));
+            var stashSize = (StashPosSize) cbStashSize.SelectedValue;
+            await Task.Run(() => PoeSorter.StartSorting(interruptEvent, stashSize));
             Unregistered();
         }
 
@@ -216,5 +239,13 @@ namespace POEStashSorter
 
         }
 
+        private void cbStashSize_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (PoeSorter.Initialized)
+            {
+                Settings.Instance.StashSizeID = cbStashSize.SelectedIndex;
+                Settings.Instance.SaveChanges();
+            }
+        }
     }
 }

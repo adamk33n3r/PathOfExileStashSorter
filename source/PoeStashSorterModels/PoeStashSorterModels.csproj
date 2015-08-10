@@ -111,6 +111,7 @@
     <Compile Include="Settings.cs" />
     <Compile Include="SortingAlgorithm.cs" />
     <Compile Include="SortOption.cs" />
+    <Compile Include="StashPosSize.cs" />
     <Compile Include="Vector2.cs" />
   </ItemGroup>
   <ItemGroup>

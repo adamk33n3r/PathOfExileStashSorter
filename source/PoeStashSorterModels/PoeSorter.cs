@@ -275,9 +275,9 @@ namespace POEStashSorterModels
             }
         }
 
-        public static void StartSorting(InterruptEvent interruptEvent)
+        public static void StartSorting(InterruptEvent interruptEvent, StashPosSize stashPosSize)
         {
-            SelectedSortingAlgorithm.StartSorting(SelectedTab, SelectedTabSorted, interruptEvent);
+            SelectedSortingAlgorithm.StartSorting(new StartSortingParams(SelectedTab, SelectedTabSorted, interruptEvent, stashPosSize));
         }
 
         public static int SortingSpeed { get; set; }

@@ -96,7 +96,7 @@ namespace POEStashSorterModels
 
 
         [DllImport("user32.dll", SetLastError = true)]
-        static extern bool GetWindowRect(IntPtr hWnd, ref RECT Rect);
+        static extern bool GetWindowRect(IntPtr hWnd, out RECT Rect);
 
         [DllImport("user32.dll", SetLastError = true)]
         static extern bool GetClientRect(IntPtr hWnd, out RECT Rect);
@@ -113,25 +113,25 @@ namespace POEStashSorterModels
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true, ExactSpelling = true)]
         public static extern int ClientToScreen(IntPtr hWnd, out POINT pt);
 
-
+        public static void SetWindowSize(int width, int height, ref RECT sRect)
+        {
+            RECT wRect;
+            var handle = currentProcess.MainWindowHandle;
+            GetWindowRect(handle, out wRect);
+            var borderTop = sRect.Top - wRect.Top;
+            var borderLeft = sRect.Left - wRect.Left;
+            var borderBottom = wRect.Bottom - wRect.Top - sRect.Bottom - borderTop;
+            var windowWidth = width + 2*borderLeft;
+            var windowHeight = height + borderTop + borderBottom;
+            MoveWindow(handle,0, 0, windowWidth, windowHeight, true);
+            sRect = PathOfExileDimentions;
+        }
 
         public static RECT PathOfExileDimentions
         {
             get
             {
-                //RECT clientRect = new RECT();
-                //GetClientRect(currentProcess.MainWindowHandle, ref clientRect);
 
-                //POINT point;
-                //ScreenToClient(currentProcess.MainWindowHandle, out point);
-
-                //RECT rect = new RECT();
-                //rect.Left = point.X * -1 + clientRect.Left;
-                //rect.Right = point.X * -1 + clientRect.Right;
-                //rect.Top = point.Y * -1 + clientRect.Top;
-                //rect.Bottom = point.Y * -1 + clientRect.Bottom;
-
-                //return rect;
                 RECT rect;
                 POINT point;
                 var handle = currentProcess.MainWindowHandle;

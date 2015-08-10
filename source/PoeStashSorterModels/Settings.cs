@@ -33,7 +33,10 @@ namespace POEStashSorterModels
                                 instance = new Settings();
                             }
                     else
+                    {
                         instance = new Settings();
+                        instance.Speed = 0.7;
+                    }
                 }
                 return instance;
             }
@@ -94,6 +97,9 @@ namespace POEStashSorterModels
 
         [XmlElement(Order = 8)]
         public int ServerID;
+
+        [XmlElement(Order = 9)]
+        public int StashSizeID;
 
         [XmlElement(Order = 4)]
         public Dictionary<string, GemRequirement> GemColorInfo = new Dictionary<string, GemRequirement>();
