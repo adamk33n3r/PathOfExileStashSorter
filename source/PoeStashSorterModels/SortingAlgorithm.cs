@@ -136,9 +136,9 @@ namespace POEStashSorterModels
                 }
                 //img.Save("c:\\444.png", ImageFormat.Png);
                 var colorFilter = new ColorFiltering();
-                colorFilter.Red = new IntRange(0, 62);
-                colorFilter.Green = new IntRange(0, 62);
-                colorFilter.Blue = new IntRange(0, 62);
+                colorFilter.Red = new IntRange(0, 65);
+                colorFilter.Green = new IntRange(0, 65);
+                colorFilter.Blue = new IntRange(0, 65);
                 colorFilter.FillOutsideRange = false;
 
                 colorFilter.ApplyInPlace(img);
@@ -156,21 +156,22 @@ namespace POEStashSorterModels
                 {
                     var edgePoints = blobCounter.GetBlobsEdgePoints(blob);
                     List<IntPoint> cornerPoints;
-                    
+
                     if (shapeChecker.IsQuadrilateral(edgePoints, out cornerPoints))
                     {
                         if (shapeChecker.CheckPolygonSubType(cornerPoints) == PolygonSubType.Square)
                         {
                             var rectangle = new Rectangle(cornerPoints[0].X, cornerPoints[1].Y, cornerPoints[1].X - cornerPoints[0].X, cornerPoints[2].Y - cornerPoints[1].Y);
+                            if (rectangle.Width < 50 || rectangle.Height < 50)
+                                continue;
+                            //Graphics g = Graphics.FromImage(img);
+                            //g.DrawRectangle(new Pen(Color.Red), rectangle);
+                            //img.Save("с:/result.png");
                             return rectangle;
-                            /*Graphics g = Graphics.FromImage(img);
-                            g.DrawRectangle(new Pen(Color.Red), rectangle);
-                            //g.DrawPolygon(new Pen(Color.Red, 5.0f), Points.ToArray());
-                            img.Save("с:/result.png");*/
                         }
                     }
                 }
-             
+
             }
             throw new Exception("Stash hasn't found");
         }
