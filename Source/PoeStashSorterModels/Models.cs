@@ -9,6 +9,7 @@ using System.Net;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -551,8 +552,8 @@ namespace POEStashSorterModels
                     try
                     {
                         var taa = Properties
-                            .FirstOrDefault(x => x.Name.ToLower() == "map level" || x.Name.ToLower() == "level");
-                        level = taa.Values.Max(x => Convert.ToInt32(x.Max(c => Convert.ToInt32(c))));
+                            .FirstOrDefault(x => Regex.IsMatch(x.Name, "map tier|map level|level",RegexOptions.IgnoreCase));
+                        level = taa?.Values.Max(x => Convert.ToInt32(x.Max(c => Convert.ToInt32(c))))??0;
                     }
                     catch (Exception)
                     {
