@@ -45,7 +45,7 @@ namespace PoeStashSorterModels.Servers
                     while (oldUrl == driver.Url)
                     {
                         var errorMessages = driver.FindElements(By.ClassName("errorMsg"));
-                        if (errorMessages.Count > 0)
+                        if (errorMessages.Count>0 && errorMessages.First().Displayed)
                         {
                             throw new CharacterInfoException(errorMessages.First().Text);
                         }

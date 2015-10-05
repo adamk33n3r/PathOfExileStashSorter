@@ -25,7 +25,7 @@ namespace POEStashSorter
     public partial class LoginWindow : Window
     {
         private Server server;
-        private double originalHight;
+        private double originalHeight;
         public LoginWindow()
         {
             InitializeComponent();
@@ -50,7 +50,7 @@ namespace POEStashSorter
             CbComboBox.ItemsSource = servers;
             CbComboBox.DisplayMemberPath = "Name";
             CbComboBox.SelectedIndex = Settings.Instance.ServerID;
-            originalHight = Height;
+            originalHeight = Height;
         }
 
 
@@ -92,7 +92,7 @@ namespace POEStashSorter
             }
             catch (Exception ex)
             {
-                Height = originalHight + 25;
+                Height = originalHeight + 25;
                 HideOverlay();
                 ErrorText.Content = ex.Message;
             }
