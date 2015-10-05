@@ -41,30 +41,39 @@ namespace POEStashSorter
         public MainWindow()
         {
             InitializeComponent();
-            PoeSorter.Initialize(stashPanel, Dispatcher, ddlSortMode, ddlSortOption);
-            txtSearch.Visibility = System.Windows.Visibility.Hidden;
-            StashTabs.DisplayMemberPath = "Name";
-            ddlSortMode.DisplayMemberPath = "Name";
-            PopulateLeagueDDL();
-            PopulateSpeedSlider();
-            PopulateSortingDDL();
-            PopulateStashSize();
-
-            if (ddlLeague.Items.Count == 0)
+            try
             {
-                ddlLeague.IsEnabled = StartSorting.IsEnabled = ddlSortMode.IsEnabled = ddlSortOption.IsEnabled = false;
+                PoeSorter.Initialize(stashPanel, Dispatcher, ddlSortMode, ddlSortOption);
+                txtSearch.Visibility = System.Windows.Visibility.Hidden;
+                StashTabs.DisplayMemberPath = "Name";
+                ddlSortMode.DisplayMemberPath = "Name";
+                PopulateLeagueDDL();
+                PopulateSpeedSlider();
+                PopulateSortingDDL();
+                PopulateStashSize();
+
+                if (ddlLeague.Items.Count == 0)
+                {
+                    ddlLeague.IsEnabled =
+                        StartSorting.IsEnabled = ddlSortMode.IsEnabled = ddlSortOption.IsEnabled = false;
+                }
+
+                this.Activated += OnFocus;
+
+                this.Loaded += delegate
+                {
+                    handle = new WindowInteropHelper(this).Handle;
+                };
+                this.Closed += delegate
+                {
+                    Unregistered();
+                };
             }
-
-            this.Activated += OnFocus;
-           
-            this.Loaded += delegate
+            catch
             {
-                handle = new WindowInteropHelper(this).Handle;
-            };
-            this.Closed += delegate
-            {
-                Unregistered();
-            };
+                Close();
+                throw;
+            }
 
         }
 
@@ -247,5 +256,7 @@ namespace POEStashSorter
                 Settings.Instance.SaveChanges();
             }
         }
+
+      
     }
 }

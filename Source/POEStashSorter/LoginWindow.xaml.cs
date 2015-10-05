@@ -14,6 +14,7 @@ using System.Windows.Shapes;
 using POEStashSorterModels;
 using System.Threading;
 using System.Windows.Threading;
+using PoeStashSorterModels.Exceptions;
 using PoeStashSorterModels.Servers;
 
 namespace POEStashSorter
@@ -24,6 +25,7 @@ namespace POEStashSorter
     public partial class LoginWindow : Window
     {
         private Server server;
+        private double originalHight;
         public LoginWindow()
         {
             InitializeComponent();
@@ -47,16 +49,14 @@ namespace POEStashSorter
             servers.Add(new GarenaTWServer());
             CbComboBox.ItemsSource = servers;
             CbComboBox.DisplayMemberPath = "Name";
-
-            CbComboBox.SelectedIndex = Settings.Instance.ServerID;    
+            CbComboBox.SelectedIndex = Settings.Instance.ServerID;
+            originalHight = Height;
         }
+
 
         private void btnLogin_Click(object sender, RoutedEventArgs e)
         {
-            overlayBg.Visibility = System.Windows.Visibility.Visible;
-            overlayTxt.Visibility = System.Windows.Visibility.Visible;
-            Wait(1);
-
+            ShowOverlay();
             String username = null;
             String password = null;
             bool useSessionID = chkUseSessionID.IsChecked == true;
@@ -79,14 +79,35 @@ namespace POEStashSorter
                 password = txtSessionID.Text;
             }
             Settings.Instance.ServerID = CbComboBox.SelectedIndex;
-            PoeConnector.Connect(server, username, password, useSessionID);
+            
+            try
+            {
+                PoeConnector.Connect(server, username, password, useSessionID);
+                Settings.Instance.SaveChanges();
+                ErrorText.Content = string.Empty;
+                var main = new MainWindow();
+                main.Show();
+                Application.Current.MainWindow = main;
+                this.Close();
+            }
+            catch (Exception ex)
+            {
+                Height = originalHight + 25;
+                HideOverlay();
+                ErrorText.Content = ex.Message;
+            }
 
-            Settings.Instance.SaveChanges();
+        }
 
-            MainWindow main = new MainWindow();
-            App.Current.MainWindow = main;
-            this.Close();
-            main.Show();
+        private void ShowOverlay()
+        {
+            overlayBg.Visibility = overlayTxt.Visibility = Visibility.Visible;
+            Wait(0.5);
+        }
+        private void HideOverlay()
+        {
+            overlayBg.Visibility = overlayTxt.Visibility = Visibility.Hidden;
+            Wait(0.5);
         }
 
         private void chkUseSessionID_Checked(object sender, RoutedEventArgs e)

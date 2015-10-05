@@ -93,9 +93,9 @@ namespace POEStashSorterModels
             PoeSorter.ddlSortOption = ddlSortOption;
             PoeSorter.Dispatcher = dispatcher;
             PoeSorter.ItemCanvas = itemCanvas;
-            PoeSorter.Leagues = PoeConnector.FetchLeagues();
-            
-            //PoeSorter.Character = PoeConnector.FetchCharecters();
+            var leagues = PoeConnector.FetchLeagues();
+            PoeSorter.Leagues = leagues;
+            //PoeSorter.Character = PoeConnector.FetchCharacters();
         }
 
         public static void ReloadAlgorithms()

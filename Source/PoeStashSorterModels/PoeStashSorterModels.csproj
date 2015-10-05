@@ -92,6 +92,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Direction.cs" />
+    <Compile Include="Exceptions\CharacterInfoException.cs" />
     <Compile Include="GemRequirement.cs" />
     <Compile Include="GemType.cs" />
     <Compile Include="InterruptEvent.cs" />

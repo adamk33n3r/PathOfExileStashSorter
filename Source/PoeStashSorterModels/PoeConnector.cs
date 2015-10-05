@@ -6,6 +6,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PoeStashSorterModels.Exceptions;
 using PoeStashSorterModels.Servers;
 
 namespace POEStashSorterModels
@@ -23,7 +24,8 @@ namespace POEStashSorterModels
 
         public static List<League> FetchLeagues()
         {
-            return FetchCharecters()
+            var characters = FetchCharacters();
+            return characters
                 .GroupBy(x => x.League)
                 .Select(x => new League(x.First().League))
                 .ToList();
@@ -62,12 +64,13 @@ namespace POEStashSorterModels
             return tab;
         }
 
-        public static List<Character> FetchCharecters()
+        public static List<Character> FetchCharacters()
         {
-            List<Character> charecters;
             string jsonData = server.WebClient.DownloadString(server.CharacterUrl);
-            charecters = JsonConvert.DeserializeObject<List<Character>>(jsonData);
-            return charecters;
+            if (jsonData == "false")
+                throw new CharacterInfoException();
+            var characters = JsonConvert.DeserializeObject<List<Character>>(jsonData);
+            return characters;
         }
     }
 }
