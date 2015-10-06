@@ -173,7 +173,7 @@ namespace POEStashSorterModels
                 }
 
             }
-            throw new Exception("Stash hasn't found");
+            throw new Exception("Stash hasn't been found");
         }
 
         public void StartSorting(StartSortingParams sortingParams)
