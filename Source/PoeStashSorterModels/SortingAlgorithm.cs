@@ -162,7 +162,7 @@ namespace POEStashSorterModels
                         if (shapeChecker.CheckPolygonSubType(cornerPoints) == PolygonSubType.Square)
                         {
                             var rectangle = new Rectangle(cornerPoints[0].X, cornerPoints[1].Y, cornerPoints[1].X - cornerPoints[0].X, cornerPoints[2].Y - cornerPoints[1].Y);
-                            if (rectangle.Width < 50 || rectangle.Height < 50)
+                            if (rectangle.Width < 200 || rectangle.Height < 200)
                                 continue;
                             //Graphics g = Graphics.FromImage(img);
                             //g.DrawRectangle(new Pen(Color.Red), rectangle);
