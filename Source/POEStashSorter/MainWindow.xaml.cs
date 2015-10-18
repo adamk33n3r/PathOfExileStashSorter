@@ -126,7 +126,8 @@ namespace POEStashSorter
         {
             List<StashPosSize> list = new List<StashPosSize>
             {
-                new StashPosSize(0, 0, new Rectangle (0, 0, 0,0)),
+                new StashPosSize("Auto"),
+                new StashPosSize("Auto(IR)", "Auto (Image Recognition)"),
                 new StashPosSize(1600, 900, new Rectangle(12, 132, 540, 661)),
                 new StashPosSize(1499, 900, new Rectangle(11, 132, 506, 661)),
                 new StashPosSize(1366, 768, new Rectangle(10, 113, 461, 564)),

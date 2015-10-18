@@ -1,41 +1,48 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using POEStashSorterModels;
+﻿using System.Drawing;
 
 namespace PoeStashSorterModels
 {
     public struct StashPosSize
     {
-        public Rectangle Rect { get; private set; }
-        public int Height { get; set; }
-        public int Widht { get; private set; }
+        private readonly string toolTip;
 
-        public StashPosSize(int widht, int height, Rectangle rect)
+        public StashPosSize(int width, int height, Rectangle rect)
         {
-            Widht = widht;
+            Width = width;
             Height = height;
             Rect = rect;
+            Text = toolTip = null;
         }
+
+        public StashPosSize(string text, string tooltip = null)
+        {
+            Width = Height = 0;
+            Rect = new Rectangle();
+            Text = text;
+            toolTip = tooltip;
+        }
+
+        public Rectangle Rect { get; }
+        public int Height { get; }
+        public int Width { get; }
+        public string Text { get; }
+        public string Tooltip => toolTip ?? ToString();
+
         public override string ToString()
         {
-            if (Height == Widht && Widht == 0)
-                return "Auto";
-            return string.Format("{0}x{1}", Widht, Height);
+            if (Text != null)
+                return Text;
+            return $"{Width}x{Height}";
         }
 
         public override int GetHashCode()
         {
-            return Height * 1000000 + Widht;
+            return Height*1000000 + Width;
         }
-
 
         public override bool Equals(object obj)
         {
-            if (obj == null || typeof(StashPosSize) != obj.GetType())
+            if (obj == null || typeof (StashPosSize) != obj.GetType())
             {
                 return false;
             }
