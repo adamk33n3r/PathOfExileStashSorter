@@ -86,31 +86,41 @@ namespace POEStashSorterModels
             const int CELL_COUNT_X = 12;
             RECT rect = ApplicationHelper.PathOfExileDimentions;
 
-            Rectangle stashRectangle;
-
-            if (!sortingParams.StashPosSize.Equals(default(StashPosSize)))
+            float startX, startY;
+            if (sortingParams.StashPosSize.Text == "Auto")
             {
-                Func<RECT, bool> checkScreenSize = (r) => r.Right != sortingParams.StashPosSize.Widht && r.Bottom != sortingParams.StashPosSize.Height;
-                if (checkScreenSize(rect))
-                {
-                    ApplicationHelper.SetWindowSize(sortingParams.StashPosSize.Widht, sortingParams.StashPosSize.Height, ref rect);
-                    Task.Delay(3000).Wait();
-                    if (checkScreenSize(rect))
-                        throw new Exception("Failed to change screen resolution to " + sortingParams.StashPosSize);
-                }
-                stashRectangle = sortingParams.StashPosSize.Rect;
+                cellHeight = rect.Bottom * 0.0484f;
+                startX = rect.Bottom * 0.033f;
+                startY = rect.Bottom * 0.1783f;
             }
             else
-                stashRectangle = GetStashRectangle(rect);
+            {
+                var stashRectangle = sortingParams.StashPosSize.Text == "Auto(IR)"
+                    ? GetStashRectangleViaImageRecognition(rect)
+                    : SetScreenSize(sortingParams, ref rect);
 
-            cellHeight = (float)stashRectangle.Width / CELL_COUNT_X; // height * 0.0484f;
+                cellHeight = (float)stashRectangle.Width / CELL_COUNT_X;
+                startX = stashRectangle.Left + cellHeight / 2.0f;
+                startY = stashRectangle.Top + cellHeight / 2.0f;
+            }
+
             cellWidth = cellHeight;
-
-            float startX = stashRectangle.Left + cellHeight / 2.0f;// height * 0.033f;
-            float startY = stashRectangle.Top + cellHeight / 2.0f;//height * 0.1783f;
-
             startPos = new Point(rect.Left + (int)startX, rect.Top + (int)startY);
+        }
 
+        private static Rectangle SetScreenSize(StartSortingParams sortingParams, ref RECT rect)
+        {
+            Func<RECT, bool> checkScreenSize =
+                (r) => r.Right != sortingParams.StashPosSize.Width && r.Bottom != sortingParams.StashPosSize.Height;
+            if (checkScreenSize(rect))
+            {
+                ApplicationHelper.SetWindowSize(sortingParams.StashPosSize.Width, sortingParams.StashPosSize.Height, ref rect);
+                Task.Delay(3000).Wait();
+                if (checkScreenSize(rect))
+                    throw new Exception("Failed to change screen resolution to " + sortingParams.StashPosSize);
+            }
+            var stashRectangle = sortingParams.StashPosSize.Rect;
+            return stashRectangle;
         }
 
         private struct PointColor
@@ -126,7 +136,7 @@ namespace POEStashSorterModels
             }
         }
 
-        private static Rectangle GetStashRectangle(RECT rect)
+        private static Rectangle GetStashRectangleViaImageRecognition(RECT rect)
         {
             using (Bitmap img = new Bitmap(rect.Right/2, rect.Bottom))
             {
