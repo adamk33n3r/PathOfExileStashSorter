@@ -115,6 +115,7 @@
     <Compile Include="SortOption.cs" />
     <Compile Include="StashPosSize.cs" />
     <Compile Include="Vector2.cs" />
+    <Compile Include="WinApi.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

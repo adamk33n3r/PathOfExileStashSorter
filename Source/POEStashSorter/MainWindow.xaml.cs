@@ -19,6 +19,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using PoeStashSorterModels;
+using static PoeStashSorterModels.WinApi;
 using Rectangle=System.Drawing.Rectangle;
 
 namespace POEStashSorter
@@ -30,11 +31,6 @@ namespace POEStashSorter
     {
         InterruptEvent interruptEvent=new InterruptEvent();
          IntPtr handle=new IntPtr();
-        [DllImport("user32.dll")]
-        private static extern bool RegisterHotKey(IntPtr hWnd, int id, int fsModifiers, int vk);
-
-        [DllImport("user32.dll")]
-        private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
 
         const int ESCAPE = 27;
 
@@ -257,7 +253,5 @@ namespace POEStashSorter
                 Settings.Instance.SaveChanges();
             }
         }
-
-      
     }
 }

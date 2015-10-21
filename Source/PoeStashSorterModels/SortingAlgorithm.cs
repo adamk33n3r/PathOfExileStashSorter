@@ -84,7 +84,7 @@ namespace POEStashSorterModels
         private void CalcStashDimentions(StartSortingParams sortingParams)
         {
             const int CELL_COUNT_X = 12;
-            RECT rect = ApplicationHelper.PathOfExileDimentions;
+            WinApi.Rect rect = ApplicationHelper.PathOfExileDimentions;
 
             float startX, startY;
             if (sortingParams.StashPosSize.Text == "Auto")
@@ -108,9 +108,9 @@ namespace POEStashSorterModels
             startPos = new Point(rect.Left + (int)startX, rect.Top + (int)startY);
         }
 
-        private static Rectangle SetScreenSize(StartSortingParams sortingParams, ref RECT rect)
+        private static Rectangle SetScreenSize(StartSortingParams sortingParams, ref WinApi.Rect rect)
         {
-            Func<RECT, bool> checkScreenSize =
+            Func<WinApi.Rect, bool> checkScreenSize =
                 (r) => r.Right != sortingParams.StashPosSize.Width && r.Bottom != sortingParams.StashPosSize.Height;
             if (checkScreenSize(rect))
             {
@@ -136,7 +136,7 @@ namespace POEStashSorterModels
             }
         }
 
-        private static Rectangle GetStashRectangleViaImageRecognition(RECT rect)
+        private static Rectangle GetStashRectangleViaImageRecognition(WinApi.Rect rect)
         {
             using (Bitmap img = new Bitmap(rect.Right/2, rect.Bottom))
             {
