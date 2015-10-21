@@ -175,6 +175,13 @@ namespace POEStashSorter
             var stashSize = (StashPosSize) cbStashSize.SelectedValue;
             await Task.Run(() => PoeSorter.StartSorting(interruptEvent, stashSize));
             Unregistered();
+            BackToFront();
+        }
+
+        private void BackToFront()
+        {
+            SetForegroundWindow(handle);
+            WindowState = WindowState.Normal;
         }
 
         private void ddlSortMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
