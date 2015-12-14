@@ -105,6 +105,7 @@
     <Compile Include="Point.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SecurityExtensions.cs" />
+    <Compile Include="Servers\GarenaServer.cs" />
     <Compile Include="Servers\GarenaCisServer.cs" />
     <Compile Include="Servers\GarenaSgServer.cs" />
     <Compile Include="Servers\GarenaThServer.cs" />

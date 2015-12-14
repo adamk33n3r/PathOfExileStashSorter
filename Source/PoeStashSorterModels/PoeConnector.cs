@@ -15,11 +15,13 @@ namespace POEStashSorterModels
     public static class PoeConnector
     {
         public static Server server;
+        private static string accountName;
        
         public static void Connect(Server server, string email, string password, bool useSessionId = false)
         {
             PoeConnector.server = server;
-            server.Connect(email,password,useSessionId);
+            server.Connect(email, password, useSessionId);
+            accountName = server.GetAccountName();
         }
 
         public static List<League> FetchLeagues()
@@ -33,7 +35,7 @@ namespace POEStashSorterModels
 
         public static List<Tab> FetchTabs(League league)
         {
-            string jsonData = server.WebClient.DownloadString(string.Format(server.StashUrl, league.Name, 0));
+            string jsonData = server.WebClient.DownloadString(string.Format(server.StashUrl, accountName, league.Name, 0));
             if (jsonData != "false")
             {
                 Stash stash = JsonConvert.DeserializeObject<Stash>(jsonData);
@@ -57,7 +59,7 @@ namespace POEStashSorterModels
         public static async Task<Tab> FetchTabAsync(int tabIndex, League league)
         {
             while (server.WebClient.IsBusy) { }
-            string jsonData = await server.WebClient.DownloadStringTaskAsync(new Uri(string.Format(server.StashUrl, league.Name, tabIndex)));
+            string jsonData = await server.WebClient.DownloadStringTaskAsync(new Uri(string.Format(server.StashUrl, accountName, league.Name, tabIndex)));
             Stash stash = JsonConvert.DeserializeObject<Stash>(jsonData);
             Tab tab = stash.Tabs.FirstOrDefault(x => x.Index == tabIndex);
             tab.Items = stash.Items;

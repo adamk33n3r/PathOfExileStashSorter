@@ -1,48 +1,28 @@
-﻿using System.Net;
+﻿using System.Linq;
+using System.Net;
+using HtmlAgilityPack;
 using POEStashSorterModels;
 
 namespace PoeStashSorterModels.Servers
 {
     public abstract class Server
     {
-        protected virtual string Domain
-        {
-            get { return "www.pathofexile.com"; }
-        }
+        protected virtual string Domain => "www.pathofexile.com";
 
-        public virtual string Url
-        {
-            get { return "http://" + Domain; }
-        }
+        public virtual string Url => "http://" + Domain;
 
-        protected virtual string LoginUrl
-        {
-            get { return string.Format("https://{0}/login", Domain); }
-        }
+        protected virtual string LoginUrl => $"https://{Domain}/login";
 
-        protected virtual string SessionIdName
-        {
-            get { return "PHPSESSID"; }
-        }
+        protected virtual string SessionIdName => "POESESSID";
 
-        public virtual string CharacterUrl
-        {
-            get { return string.Format("http://{0}/character-window/get-characters", Domain); }
-        }
+        public virtual string CharacterUrl => $"http://{Domain}/character-window/get-characters";
 
-        public virtual string StashUrl
-        {
-            get
-            {
-                return string.Format("http://{0}/character-window/get-stash-items?league={{0}}&tabs=1&tabIndex={{1}}",
-                    Domain);
-            }
-        }
+        protected virtual string MyAccountUrl => $"https://{Domain}/my-account";
 
-        public virtual string EmailLoginName
-        {
-            get { return "Email"; }
-        }
+        public virtual string StashUrl =>
+            $"http://{Domain}/character-window/get-stash-items?accountName={{0}}&league={{1}}&tabs=1&tabIndex={{2}}";
+
+        public virtual string EmailLoginName => "Email";
 
         public abstract string Name { get; }
 
@@ -57,7 +37,15 @@ namespace PoeStashSorterModels.Servers
             }
         }
 
-
+        public virtual string GetAccountName()
+        {
+            var myAccountUrl = WebClient.DownloadString(MyAccountUrl);
+            var h = new HtmlDocument();
+            h.LoadHtml(myAccountUrl);
+            var accountName = h.DocumentNode.SelectNodes("//span[@class='profile-link']/a").First().InnerText;
+            return accountName;
+        }
+        
         protected void SetCookie(string password)
         {
             WebClient.Cookies.Add(new Cookie(SessionIdName, password, "/", Domain));

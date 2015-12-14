@@ -1,6 +1,6 @@
 ﻿namespace PoeStashSorterModels.Servers
 {
-    public class GarenaSgServer : GarenaCisServer
+    public class GarenaSgServer : GarenaServer
     {
         protected override string Domain
         {
