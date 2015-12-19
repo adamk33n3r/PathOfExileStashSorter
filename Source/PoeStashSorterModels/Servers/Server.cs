@@ -46,7 +46,7 @@ namespace PoeStashSorterModels.Servers
             h.LoadHtml(myAccountUrl);
             try
             {
-                var accountName = h.DocumentNode.SelectNodes("//span[@class='profile-link']/a").First().InnerText;
+                var accountName = h.DocumentNode.SelectNodes("//span[starts-with(@class,'profile-link')]/a").First().InnerText;
                 return accountName;
             }
             catch (Exception)
