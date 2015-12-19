@@ -1,6 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Net;
 using HtmlAgilityPack;
+using PoeStashSorterModels.Exceptions;
 using POEStashSorterModels;
 
 namespace PoeStashSorterModels.Servers
@@ -42,10 +44,18 @@ namespace PoeStashSorterModels.Servers
             var myAccountUrl = WebClient.DownloadString(MyAccountUrl);
             var h = new HtmlDocument();
             h.LoadHtml(myAccountUrl);
-            var accountName = h.DocumentNode.SelectNodes("//span[@class='profile-link']/a").First().InnerText;
-            return accountName;
+            try
+            {
+                var accountName = h.DocumentNode.SelectNodes("//span[@class='profile-link']/a").First().InnerText;
+                return accountName;
+            }
+            catch (Exception)
+            {
+                throw new CharacterInfoException("Account name wasn't found");
+            }
+
         }
-        
+
         protected void SetCookie(string password)
         {
             WebClient.Cookies.Add(new Cookie(SessionIdName, password, "/", Domain));

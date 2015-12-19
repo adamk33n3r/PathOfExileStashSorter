@@ -1,6 +1,8 @@
 ﻿using System.Collections.Specialized;
 using System.Linq;
+using System.Text;
 using HtmlAgilityPack;
+using PoeStashSorterModels.Exceptions;
 
 namespace PoeStashSorterModels.Servers
 {
@@ -28,7 +30,14 @@ namespace PoeStashSorterModels.Servers
                 loginData.Add("login", "Login");
                 loginData.Add("remember_me", "0");
                 loginData.Add("hash", hash);
-                WebClient.UploadValues("/login", "POST", loginData);
+                var response = WebClient.UploadValues("/login", "POST", loginData);
+
+                var responseHtml = Encoding.UTF8.GetString(response);
+                h.LoadHtml(responseHtml);
+                var errors = h.DocumentNode.SelectNodes("//ul[@class='errors']");
+                if (errors != null)
+                    throw new CharacterInfoException(errors.First().InnerText);
+
             }
         }
     }
