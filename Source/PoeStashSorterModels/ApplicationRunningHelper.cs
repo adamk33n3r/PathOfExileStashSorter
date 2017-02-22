@@ -25,6 +25,8 @@ namespace POEStashSorterModels
         public static bool OpenPathOfExile()
         {
             const int swRestore = 9;
+
+/*OLD VERSION THAT NO LONGER WORKS (as of: 2016-12-26)
             var arrProcesses = Process.GetProcessesByName("PathOfExile");
             if (arrProcesses.Length > 0)
             {
@@ -46,6 +48,42 @@ namespace POEStashSorterModels
                 SetForegroundWindow(hWnd);
                 return true;
             }
+*/
+
+            /*
+             *  New Version of routine for finding the PoE process no matter what form the name takes
+             */
+            Process[] arrProcesses;
+
+            //Create an array of possible process names
+            string[] processNameArray = 
+                {
+                    "PathOfExile"
+                    ,"PathOfExile.exe"
+                    ,"PathOfExile_x64"
+                    ,"PathOfExile_x64.exe"
+                    ,"PathOfExileSteam"
+                    ,"PathOfExileSteam.exe"
+                    ,"PathOfExile_x64Steam"
+                    ,"PathOfExile_x64Steam.exe"
+                };
+
+            //Loop through the array of process names
+            foreach (string processName in processNameArray)
+            {
+                arrProcesses = Process.GetProcessesByName(processName);
+                if (arrProcesses.Length > 0)
+                {
+                    currentProcess = arrProcesses[0];
+
+                    var hWnd = arrProcesses[0].MainWindowHandle;
+                    if (IsIconic(hWnd))
+                        ShowWindowAsync(hWnd, swRestore);
+                    SetForegroundWindow(hWnd);
+                    return true;
+                }
+            }
+
             throw new Exception("Path Of Exile isn't running");
         }
 

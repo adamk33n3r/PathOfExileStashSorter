@@ -10,7 +10,7 @@ namespace PoeStashSorterModels.Servers
     {
         public override string Name
         {
-            get { return "EuServer"; }
+            get { return "Us/EuServer"; }
         }
 
         public override void Connect(string email, string password, bool useSessionId = false)
