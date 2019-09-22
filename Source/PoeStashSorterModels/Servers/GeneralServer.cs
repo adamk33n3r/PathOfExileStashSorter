@@ -8,9 +8,11 @@ namespace PoeStashSorterModels.Servers
 {
     public class GeneralServer : Server
     {
+        public override bool OnlySid => true;
+
         public override string Name
         {
-            get { return "Us/EuServer"; }
+            get { return "Us/Eu/CisServer"; }
         }
 
         public override void Connect(string email, string password, bool useSessionId = false)

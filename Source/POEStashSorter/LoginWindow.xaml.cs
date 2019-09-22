@@ -43,7 +43,7 @@ namespace POEStashSorter
             
             List<Server> servers=new List<Server>();
             servers.Add(new GeneralServer());
-            servers.Add(new GarenaCisServer());
+            
             servers.Add(new GarenaThServer());
             servers.Add(new GarenaSgServer());
             servers.Add(new GarenaTWServer());
@@ -136,6 +136,16 @@ namespace POEStashSorter
         private void CbComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             server = (Server)CbComboBox.SelectedItem;
+            if (server.OnlySid)
+            {
+                chkUseSessionID.IsChecked = true;
+                chkUseSessionID.IsEnabled = false;
+            }
+            else
+            {
+                chkUseSessionID.IsEnabled = true;
+            }
+
             lblEmail.Content = server.EmailLoginName;
             
         }

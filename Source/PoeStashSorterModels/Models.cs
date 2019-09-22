@@ -41,8 +41,6 @@ namespace POEStashSorterModels
             Name = name;
             Tabs = PoeConnector.FetchTabs(this);
             var t = Tabs.FirstOrDefault();
-            if (t != null && t.Name.Trim() == "1")
-                Tabs.Remove(t);
         }
         public string Name { get; set; }
 

@@ -11,7 +11,9 @@ namespace PoeStashSorterModels.Servers
     {
         protected virtual string Domain => "www.pathofexile.com";
 
-        public virtual string Url => "http://" + Domain;
+        public virtual bool OnlySid => false;
+
+        public virtual string Url => "https://" + Domain;
 
         protected virtual string LoginUrl => $"https://{Domain}/login";
 
