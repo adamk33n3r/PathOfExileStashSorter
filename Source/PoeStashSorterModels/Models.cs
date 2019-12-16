@@ -219,6 +219,9 @@ namespace POEStashSorterModels
         [JsonProperty(PropertyName = "frameType")]
         public int FrameType { get; set; }
 
+        [JsonProperty(PropertyName = "ilvl")]
+        public int ItemLevel { get; set; }
+
         [JsonProperty(PropertyName = "x")]
         public int X { get; set; }
 
@@ -417,6 +420,9 @@ namespace POEStashSorterModels
             clone.ExplicitMods = this.ExplicitMods;
             clone.DescrText = this.DescrText;
             clone.FrameType = this.FrameType;
+
+            clone.ItemLevel = this.ItemLevel;
+
             clone.X = this.X;
             clone.Y = this.Y;
             clone.InventoryId = this.InventoryId;
@@ -520,6 +526,30 @@ namespace POEStashSorterModels
                 }
 
                 return 0;
+            }
+        }
+
+        public String Category
+        {
+            get
+            {
+                if (this.TypeLine.Contains("Flask")) {
+                    return "Flask";
+                }
+                
+                return this.Icon.Split('/')[6];
+                // return this.Icon.Split('/', StringSplitOptions.None)[4];
+            }
+        }
+        public String SubCategory
+        {
+            get
+            {
+                String sc = this.Icon.Split('/')[7];
+                if (sc.Contains(".png")) {
+                    return null;
+                }
+                return sc;
             }
         }
 

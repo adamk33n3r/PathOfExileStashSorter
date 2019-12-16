@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -90,8 +91,8 @@ namespace POEStashSorterModels
             if (sortingParams.StashPosSize.Text == "Auto")
             {
                 cellHeight = rect.Bottom * 0.0484f;
-                startX = rect.Bottom * 0.033f;
-                startY = rect.Bottom * 0.1783f;
+                startX = rect.Bottom * 0.033f - cellHeight / 2.0f;
+                startY = rect.Bottom * 0.1783f - cellHeight / 2.0f;
             }
             else
             {
@@ -186,22 +187,63 @@ namespace POEStashSorterModels
             throw new Exception("Stash hasn't been found");
         }
 
+        public bool ItemOverlap(Item A, Item B) {
+            String foo = A.FullItemName;
+            String bar = B.FullItemName;
+
+            int AX2 = A.X + A.W;
+            int AY2 = A.Y + A.H;
+            int BX2 = B.X + B.W;
+            int BY2 = B.Y + B.H;
+
+            bool collision = (
+                A.X < BX2 && // 
+                AX2 > B.X && // 
+                A.Y < BY2 && // 
+                AY2 > B.Y    // 
+            );
+
+            // Debug.WriteLine(collision 
+            //     + ", A: " + A.X + "-" + A.Y + ", " + A.W + "/" + A.H 
+            //     + ", B: " + B.X + "-" + B.Y + ", " + B.W + "/" + B.H 
+            //     + "(" + A.FullItemName + ", " + B.FullItemName + ")");
+
+            // Debug.WriteLine( A.X + " < " + BX2 + " = " + ( A.X < BX2));
+            // Debug.WriteLine( AX2 + " > " + B.X + " = " + ( AX2 > B.X));
+            // Debug.WriteLine( A.Y + " < " + BY2 + " = " + ( A.Y < BY2));
+            // Debug.WriteLine( AY2 + " > " + B.Y + " = " + ( AY2 > B.Y));
+
+            return collision;
+        }
+
+        public Item FindMovableItem(List<Item> unsortedItems) {
+            // FIXME: implement
+            return unsortedItems.FirstOrDefault();
+        }
+
         public void StartSorting(StartSortingParams sortingParams)
         {
             try
             {
                 ApplicationHelper.OpenPathOfExile();
-                List<Item> unsortedItems = sortingParams.UnsortedTab.Items.Where(x => sortingParams.SortedTab.Items.Any(c => c.Id == x.Id && c.X == x.X && x.Y == c.Y) == false).ToList();
+                List<Item> unsortedItems = sortingParams.UnsortedTab.Items.Where(
+                    x => sortingParams.SortedTab.Items.Any(
+                        c => c.Id == x.Id && c.X == x.X && x.Y == c.Y) == false
+                    ).ToList();
                 if (isSorting == false)
                 {
                     CalcStashDimentions(sortingParams);
                     isSorting = true;
 
-                    Item unsortedItem = unsortedItems.FirstOrDefault();
+                    // Item unsortedItem = unsortedItems.FirstOrDefault();
+                    Item unsortedItem = FindMovableItem(unsortedItems);
 
                     if (unsortedItem != null)
                     {
-                        MouseTools.MoveCursor(MouseTools.GetMousePosition(), new Vector2(startPos.X + unsortedItem.X * cellWidth, startPos.Y + unsortedItem.Y * cellHeight), 20);
+                        MouseTools.MoveCursor(MouseTools.GetMousePosition(), new Vector2(
+                            startPos.X + unsortedItem.X * cellWidth,
+                            startPos.Y + unsortedItem.Y * cellHeight
+                        ), 20);
                         bool selectGem = true;
 
                         while (unsortedItem != null)
@@ -211,44 +253,63 @@ namespace POEStashSorterModels
                                 throw new Exception("Interrupted");
                             }
                             Item sortedItem = sortingParams.SortedTab.Items.FirstOrDefault(x => x.Id == unsortedItem.Id);
-                            Vector2 unsortedPos = new Vector2(startPos.X + unsortedItem.X * cellWidth, startPos.Y + unsortedItem.Y * cellHeight);
+                            Vector2 unsortedPos = new Vector2(
+                                startPos.X + (unsortedItem.X + unsortedItem.W / 2f) * cellWidth,
+                                startPos.Y + (unsortedItem.Y + unsortedItem.H / 2f) * cellHeight
+                            );
+
+                            Vector2 sortedPos = new Vector2(
+                                startPos.X + (sortedItem.X + sortedItem.W / 2f) * cellWidth,
+                                startPos.Y + (sortedItem.Y + sortedItem.H / 2f) * cellHeight
+                            );
+                            // Log.Message("Moving " + unsortedItem.Name + " from " + unsortedItem.X + "," + unsortedItem.Y + " to " + sortedItem.X + "," + sortedItem.Y);
+
+                            List<Item> itemsInTargetSpace = unsortedItems.Where(
+                                item => item != unsortedItem && ItemOverlap(item, sortedItem)
+                            ).ToList();
+
+                            if (itemsInTargetSpace.Count > 1)
+                            {
+                                // FIXME
+                                throw new Exception("itemsInTargetSpace.Count > 1");
+                                // FindMovableItem(unsortedItems);
+                            }
 
                             if (selectGem)
                             {
                                 //Move to item
                                 MouseTools.MoveCursor(MouseTools.GetMousePosition(), unsortedPos, 10);
+
+                                Thread.Sleep((int)(80f / Settings.Instance.Speed));
                                 //select item
                                 MouseTools.MouseClickEvent();
                                 //wait a little (internet delay)
                                 Thread.Sleep((int)(80f / Settings.Instance.Speed));
                             }
 
-                            Vector2 sortedPos = new Vector2(startPos.X + sortedItem.X * cellWidth, startPos.Y + sortedItem.Y * cellHeight);
-                            //Log.Message("Moving " + unsortedItem.Name + " from " + unsortedItem.X + "," + unsortedItem.Y + " to " + sortedItem.X + "," + sortedItem.Y);
-
                             //move to correct position
                             MouseTools.MoveCursor(MouseTools.GetMousePosition(), sortedPos, 10);
+
+                            Thread.Sleep((int)(80f / Settings.Instance.Speed));
                             //place item
                             MouseTools.MouseClickEvent();
                             //wait a little (internet delay)
                             Thread.Sleep((int)(80f / Settings.Instance.Speed));
 
-                            Item newGem = unsortedItems.FirstOrDefault(x => x.X == sortedItem.X && x.Y == sortedItem.Y);
-
                             //remove unsorted now that it is sorted
                             unsortedItems.Remove(unsortedItem);
 
                             //if there wassent a item where the item was placed
-                            if (newGem == null)
+                            if (itemsInTargetSpace.Count == 1)
                             {
-                                //selected a new to sort
-                                unsortedItem = unsortedItems.FirstOrDefault();
-                                selectGem = true;
+                                unsortedItem = itemsInTargetSpace[0];
+                                selectGem = false;
                             }
                             else
                             {
-                                unsortedItem = newGem;
-                                selectGem = false;
+                                //selected a new to sort
+                                unsortedItem = FindMovableItem(unsortedItems);
+                                selectGem = true;
                             }
 
                         }
