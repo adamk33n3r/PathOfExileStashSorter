@@ -36,6 +36,13 @@ namespace POEStashSorterModels
         public static List<Tab> FetchTabs(League league)
         {
             string jsonData = server.WebClient.DownloadString(string.Format(server.StashUrl, accountName, league.Name, 0));
+
+            // System.IO.File.WriteAllText(string.Format(
+            //     $"get-stash-items.accountName-{{0}}_league-{{1}}_tab-0.json",
+            //     accountName,
+            //     league.Name
+            // ), jsonData);
+
             if (jsonData != "false")
             {
                 Stash stash = JsonConvert.DeserializeObject<Stash>(jsonData);
@@ -46,20 +53,30 @@ namespace POEStashSorterModels
             return new List<Tab>();
         }
 
-        [Obsolete]
-        public static Tab FetchTab(int tabIndex, League league)
-        {
-            string jsonData = server.WebClient.DownloadString(string.Format(server.StashUrl, league.Name, tabIndex));
-            Stash stash = JsonConvert.DeserializeObject<Stash>(jsonData);
-            Tab tab = stash.Tabs.FirstOrDefault(x => x.Index == tabIndex);
-            tab.Items = stash.Items;
-            return tab;
-        }
+        // [Obsolete]
+        // public static Tab FetchTab(int tabIndex, League league)
+        // {
+        //     string jsonData = server.WebClient.DownloadString(string.Format(server.StashUrl, league.Name, tabIndex));
+
+        //     Stash stash = JsonConvert.DeserializeObject<Stash>(jsonData);
+        //     Tab tab = stash.Tabs.FirstOrDefault(x => x.Index == tabIndex);
+        //     tab.Items = stash.Items;
+        //     return tab;
+        // }
 
         public static async Task<Tab> FetchTabAsync(int tabIndex, League league)
         {
             while (server.WebClient.IsBusy) { }
-            string jsonData = await server.WebClient.DownloadStringTaskAsync(new Uri(string.Format(server.StashUrl, accountName, league.Name, tabIndex)));
+            string jsonData = await server.WebClient.DownloadStringTaskAsync(
+                new Uri(string.Format(server.StashUrl, accountName, league.Name, tabIndex)));
+
+            System.IO.File.WriteAllText(string.Format(
+                $"get-stash-items.accountName-{{0}}_league-{{1}}_tab-{{2}}.json",
+                accountName,
+                league.Name,
+                tabIndex
+            ), jsonData);
+
             Stash stash = JsonConvert.DeserializeObject<Stash>(jsonData);
             Tab tab = stash.Tabs.FirstOrDefault(x => x.Index == tabIndex);
             tab.Items = stash.Items;
