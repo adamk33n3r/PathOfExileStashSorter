@@ -25,6 +25,7 @@ namespace POEStashSorterModels
         private static League selectedLeague;
         private static ComboBox ddlSortMode { get; set; }
         private static ComboBox ddlSortOption { get; set; }
+        private static CheckBox chkIsInFolder { get; set; }
         public static Canvas ItemCanvas { get; private set; }
         public static League SelectedLeague
         {
@@ -71,7 +72,7 @@ namespace POEStashSorterModels
         public static List<SortingAlgorithm> SortingAlgorithms = new List<SortingAlgorithm>();
         public static Dispatcher Dispatcher { get; private set; }
         public static bool Initialized { get; private set; }
-        public static void Initialize(Canvas itemCanvas, Dispatcher dispatcher, ComboBox ddlSortMode, ComboBox ddlSortOption)
+        public static void Initialize(Canvas itemCanvas, Dispatcher dispatcher, ComboBox ddlSortMode, ComboBox ddlSortOption, CheckBox chkIsInFolder)
         {
             Initialized = true;
             var sortingAlgorithmsExtern = GetAlgorithmsAssembly()
@@ -91,6 +92,7 @@ namespace POEStashSorterModels
 
             PoeSorter.ddlSortMode = ddlSortMode;
             PoeSorter.ddlSortOption = ddlSortOption;
+            PoeSorter.chkIsInFolder = chkIsInFolder;
             PoeSorter.Dispatcher = dispatcher;
             PoeSorter.ItemCanvas = itemCanvas;
             var leagues = PoeConnector.FetchLeagues();
@@ -204,7 +206,7 @@ namespace POEStashSorterModels
                 if (tab.IsSelected)
                 {
                     tab.Items.ForEach(x => x.Image.Visibility = Visibility.Visible);
-                    SelectSortingAlgoritm(null);
+                    SelectSortingAlgorithm(null);
                 }
             }
         }
@@ -233,7 +235,7 @@ namespace POEStashSorterModels
 
         private static bool selectSortOption = true;
 
-        public static void SelectSortingAlgoritm(SortingAlgorithm sort)
+        public static void SelectSortingAlgorithm(SortingAlgorithm sort)
         {
             if (SelectedTab.Items != null)
             {
@@ -245,12 +247,13 @@ namespace POEStashSorterModels
                 }
                 else
                 {
-                    Settings.Instance.SetSortingAlgorithmForTab(sort.Name, sort.SortOption.SelectedOption, SelectedTab);
+                    Settings.Instance.SetSortingAlgorithmForTab(sort.Name, sort.SortOption.SelectedOption, Settings.Instance.GetSortingAlgorithmForTab(SelectedTab).IsInFolder, SelectedTab);
                 }
                 SelectedSortingAlgorithm = sort;
                 selectSortOption = false;
                 ddlSortOption.ItemsSource = SelectedSortingAlgorithm.SortOption.Options;
                 ddlSortOption.SelectedItem = SelectedSortingAlgorithm.SortOption.SelectedOption;
+                chkIsInFolder.IsChecked = Settings.Instance.GetSortingAlgorithmForTab(SelectedTab).IsInFolder;
                 selectSortOption = true;
                 SortTab(SelectedTab);
             }
@@ -270,9 +273,14 @@ namespace POEStashSorterModels
             if (selectSortOption)
             {
                 SelectedSortingAlgorithm.SortOption.SelectedOption = option ?? SelectedSortingAlgorithm.SortOption.Options.FirstOrDefault();
-                Settings.Instance.SetSortingAlgorithmForTab(SelectedSortingAlgorithm.Name, SelectedSortingAlgorithm.SortOption.SelectedOption, SelectedTab);
+                Settings.Instance.SetSortingAlgorithmForTab(SelectedSortingAlgorithm.Name, SelectedSortingAlgorithm.SortOption.SelectedOption, Settings.Instance.GetSortingAlgorithmForTab(SelectedTab).IsInFolder, SelectedTab);
                 SortTab(SelectedTab);
             }
+        }
+
+        public static void SetIsInFolder(bool isInFolder)
+        {
+            Settings.Instance.SetSortingAlgorithmForTab(SelectedSortingAlgorithm.Name, SelectedSortingAlgorithm.SortOption.SelectedOption, isInFolder, SelectedTab);
         }
 
         public static void StartSorting(InterruptEvent interruptEvent, StashPosSize stashPosSize)

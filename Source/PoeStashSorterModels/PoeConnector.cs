@@ -16,6 +16,10 @@ namespace POEStashSorterModels
     {
         public static Server server;
         private static string accountName;
+        private static List<string> supportedTabTypes = new List<string>() {
+            "NormalStash",
+            "PremiumStash",
+        };
        
         public static void Connect(Server server, string email, string password, bool useSessionId = false)
         {
@@ -46,7 +50,7 @@ namespace POEStashSorterModels
             if (jsonData != "false")
             {
                 Stash stash = JsonConvert.DeserializeObject<Stash>(jsonData);
-                List<Tab> tabs = stash.Tabs;
+                List<Tab> tabs = stash.Tabs.Where(t => supportedTabTypes.Contains(t.Type)).ToList();
                 tabs.ForEach(x => x.League = league);
                 return tabs;
             }

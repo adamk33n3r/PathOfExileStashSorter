@@ -39,7 +39,7 @@ namespace POEStashSorter
             InitializeComponent();
             try
             {
-                PoeSorter.Initialize(stashPanel, Dispatcher, ddlSortMode, ddlSortOption);
+                PoeSorter.Initialize(stashPanel, Dispatcher, ddlSortMode, ddlSortOption, chkIsInFolder);
                 txtSearch.Visibility = System.Windows.Visibility.Hidden;
                 StashTabs.DisplayMemberPath = "Name";
                 ddlSortMode.DisplayMemberPath = "Name";
@@ -186,7 +186,7 @@ namespace POEStashSorter
 
         private void ddlSortMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            PoeSorter.SelectSortingAlgoritm((SortingAlgorithm)ddlSortMode.SelectedItem);
+            PoeSorter.SelectSortingAlgorithm((SortingAlgorithm)ddlSortMode.SelectedItem);
             if (PoeSorter.SelectedSortingAlgorithm != null)
             {
                 ddlSortOption.ItemsSource = PoeSorter.SelectedSortingAlgorithm.SortOption.Options;
@@ -198,6 +198,11 @@ namespace POEStashSorter
         private void ddlSortOption_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             PoeSorter.SelectSortOption((string)(ddlSortOption.SelectedItem));
+        }
+
+        private void chkIsInFolder_Checked(object sender, RoutedEventArgs e)
+        {
+            PoeSorter.SetIsInFolder((bool)chkIsInFolder.IsChecked);
         }
 
         private void ReloadAlgorithms(object sender, RoutedEventArgs e)

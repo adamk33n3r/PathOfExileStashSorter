@@ -53,7 +53,7 @@ namespace POEStashSorterModels
 
         public SortingAlgorithmInfo GetSortingAlgorithmForTab(Tab tab)
         {
-            var s = SortingAlgorithmInfos.FirstOrDefault(x => x.League == tab.League.Name && x.TabIndex == tab.Index);
+            var s = SortingAlgorithmInfos.FirstOrDefault(x => x.League == tab.League.Name && x.TabID == tab.ID);
             return s ?? new SortingAlgorithmInfo()
             {
                 Name = PoeSorter.SortingAlgorithms.FirstOrDefault().Name,
@@ -69,20 +69,22 @@ namespace POEStashSorterModels
                 Serializer.Serialize(file, this);
         }
 
-        internal void SetSortingAlgorithmForTab(string name, string option, Tab SelectedTab)
+        internal void SetSortingAlgorithmForTab(string name, string option, bool isInFolder, Tab SelectedTab)
         {
-            SortingAlgorithmInfo s = SortingAlgorithmInfos.FirstOrDefault(x => x.League == SelectedTab.League.Name && x.TabIndex == SelectedTab.Index);
+            SortingAlgorithmInfo s = SortingAlgorithmInfos.FirstOrDefault(x => x.League == SelectedTab.League.Name && x.TabID == SelectedTab.ID);
             if (s == null)
             {
                 s = new SortingAlgorithmInfo()
                 {
                     League = SelectedTab.League.Name,
-                    TabIndex = SelectedTab.Index
+                    TabIndex = SelectedTab.Index,
+                    TabID = SelectedTab.ID,
                 };
                 SortingAlgorithmInfos.Add(s);
             }
             s.Name = name;
             s.Option = option;
+            s.IsInFolder = isInFolder;
             SaveChanges();
         }
 
@@ -111,10 +113,14 @@ namespace POEStashSorterModels
             public string League { get; set; }
             [XmlElement(Order = 2)]
             public int TabIndex { get; set; }
+            [XmlElement(Order = 6)]
+            public string TabID { get; set; }
             [XmlElement(Order = 3)]
             public string Name { get; set; }
             [XmlElement(Order = 4)]
             public string Option { get; set; }
+            [XmlElement(Order = 5)]
+            public bool IsInFolder { get; set; }
         }
 
 

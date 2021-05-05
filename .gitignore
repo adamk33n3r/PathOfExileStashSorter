@@ -10,6 +10,7 @@
 /bin/AForge.xml
 /bin/POEStashSorter.vshost.exe.manifest
 /bin/WebDriver.xml
+/bin/*.json
 /Source/POEStashSorter/POEStashSorter.suo
 *.suo
 /Source/POEStashSorter/.vs
@@ -22,6 +23,3 @@
 /Source/PoeStashSorterModels/bin/Release/PoeStashSorterModels.pdb
 /source/poestashsortermodels/bin
 /Source/PoeStashSorterModels/bin/x86
-/bin/SortingAlgorithms
-/bin/POEStashSorter.exe
-/bin/PoeStashSorterModels.dll

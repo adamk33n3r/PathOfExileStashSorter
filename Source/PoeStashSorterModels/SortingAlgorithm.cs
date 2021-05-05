@@ -54,6 +54,7 @@ namespace POEStashSorterModels
         {
             Tab sortedTab = new Tab();
             sortedTab.Index = tab.Index;
+            sortedTab.ID = tab.ID;
             sortedTab.League = tab.League;
             sortedTab.Name = tab.Name;
             sortedTab.srcC = tab.srcC;
@@ -82,20 +83,21 @@ namespace POEStashSorterModels
             return (SortingAlgorithm)Activator.CreateInstance(type);
         }
 
-        private void CalcStashDimentions(StartSortingParams sortingParams)
+        private void CalcStashDimensions(StartSortingParams sortingParams)
         {
             const int CELL_COUNT_X = 12;
-            WinApi.Rect rect = ApplicationHelper.PathOfExileDimentions;
+            WinApi.Rect rect = ApplicationHelper.PathOfExileDimensions;
 
             float startX, startY;
             if (sortingParams.StashPosSize.Text == "Auto")
             {
                 cellHeight = rect.Bottom * 0.0484f;
                 startX = rect.Bottom * 0.033f - cellHeight / 2.0f;
-                startY = rect.Bottom * 0.1783f - cellHeight / 2.0f;
+                startY = rect.Bottom * 0.1783f - cellHeight / 2.0f - (Settings.Instance.GetSortingAlgorithmForTab(PoeSorter.SelectedTab).IsInFolder ? 0 : cellHeight / 2.0f);
             }
             else
             {
+                // TODO: Fix the rectangle detection in non-folders
                 var stashRectangle = sortingParams.StashPosSize.Text == "Auto(IR)"
                     ? GetStashRectangleViaImageRecognition(rect)
                     : SetScreenSize(sortingParams, ref rect);
@@ -145,7 +147,7 @@ namespace POEStashSorterModels
                 {
                     g.CopyFromScreen(rect.Left, rect.Top, 0, 0, img.Size, CopyPixelOperation.SourceCopy);
                 }
-                //img.Save("c:\\444.png", ImageFormat.Png);
+                //img.Save(@"C:\Users\adamg\444.png", System.Drawing.Imaging.ImageFormat.Png);
                 var colorFilter = new ColorFiltering();
                 colorFilter.Red = new IntRange(0, 65);
                 colorFilter.Green = new IntRange(0, 65);
@@ -177,7 +179,7 @@ namespace POEStashSorterModels
                                 continue;
                             //Graphics g = Graphics.FromImage(img);
                             //g.DrawRectangle(new Pen(Color.Red), rectangle);
-                            //img.Save("с:/result.png");
+                            //img.Save(@"C:\Users\adamg\result.png");
                             return rectangle;
                         }
                     }
@@ -232,7 +234,7 @@ namespace POEStashSorterModels
                     ).ToList();
                 if (isSorting == false)
                 {
-                    CalcStashDimentions(sortingParams);
+                    CalcStashDimensions(sortingParams);
                     isSorting = true;
 
                     // Item unsortedItem = unsortedItems.FirstOrDefault();

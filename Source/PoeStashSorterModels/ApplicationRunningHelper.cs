@@ -9,7 +9,7 @@ namespace POEStashSorterModels
     {
         private static Process currentProcess;
 
-        public static Rect PathOfExileDimentions
+        public static Rect PathOfExileDimensions
         {
             get
             {
@@ -68,7 +68,7 @@ namespace POEStashSorterModels
             var windowWidth = width + 2*borderLeft;
             var windowHeight = height + borderTop + borderBottom;
             MoveWindow(handle, 0, 0, windowWidth, windowHeight, true);
-            sRect = PathOfExileDimentions;
+            sRect = PathOfExileDimensions;
         }
     }
 }

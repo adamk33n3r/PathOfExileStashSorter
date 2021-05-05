@@ -114,10 +114,19 @@ namespace POEStashSorterModels
             }
         }
 
+
+        private Dictionary<string, GemRequirement> HardCodedGemColorInfo = new Dictionary<string, GemRequirement>() {
+            { "Vaal Blight", GemRequirement.Int },
+            { "Splitting Steel", GemRequirement.Dex },
+        };
+
         public GemRequirement GemRequirement
         {
             get
             {
+                if (HardCodedGemColorInfo.ContainsKey(FullItemName))
+                    return HardCodedGemColorInfo[FullItemName];
+
                 if (Requirements != null)
                 {
                     Requirement topRequirement = Requirements
@@ -324,7 +333,8 @@ namespace POEStashSorterModels
                             this.image.Source = bitmap;
 
                             if (this.GemRequirement == POEStashSorterModels.GemRequirement.None && this.ItemType == POEStashSorterModels.ItemType.Gem)
-                                ScanGemImage(bitmap);
+                                if (HardCodedGemColorInfo.ContainsKey(this.FullItemName) == false)
+                                    ScanGemImage(bitmap);
                             //if (Tab.IsSelected)
                             //    PoeSorter.ItemCanvas.Children.Add(this.image);
                         });
@@ -657,6 +667,10 @@ namespace POEStashSorterModels
         public string Name { get; set; }
         [JsonProperty(PropertyName = "i")]
         public int Index { get; set; }
+        [JsonProperty(PropertyName = "id")]
+        public string ID { get; set; }
+        [JsonProperty(PropertyName = "type")]
+        public string Type { get; set; }
         [JsonProperty(PropertyName = "colour")]
         public Colour Colour { get; set; }
         public string srcL { get; set; }
@@ -668,6 +682,21 @@ namespace POEStashSorterModels
         public List<Item> Items { get; set; }
 
         public League League { get; set; }
+
+        public SolidColorBrush TextColor
+        {
+            get
+            {
+                Color light = Color.FromRgb(0xff, 0xff, 0xff);
+                Color dark = Color.FromRgb(0x21, 0x25, 0x29);
+                float tabLuminance = CalculateLuminance(Colour);
+                float textLuminance = CalculateLuminance(light);
+                float ratio = tabLuminance > textLuminance ? ((tabLuminance + 0.05f) / (textLuminance + 0.05f)) : ((textLuminance + 0.05f) / (tabLuminance + 0.05f));
+                float min = 7f;
+                Console.WriteLine(ratio);
+                return new SolidColorBrush(ratio < min ? dark : light);
+            }
+        }
 
         public SolidColorBrush Background
         {
@@ -696,6 +725,28 @@ namespace POEStashSorterModels
         public Tab()
         {
             IsVisible = true;
+        }
+
+        private float CalculateLuminance(Color c)
+        {
+            Colour color = new Colour
+            {
+                R = c.R,
+                G = c.G,
+                B = c.B
+            };
+            return CalculateLuminance(color);
+        }
+
+        private float CalculateLuminance(Colour c)
+        {
+            float r = c.R / 255f;
+            float g = c.G / 255f;
+            float b = c.B / 255f;
+            float R = r < 0.03928f ? r / 12.92f : Mathf.Pow((r + 0.055f) / 1.055f, 2.4f);
+            float G = g < 0.03928f ? g / 12.92f : Mathf.Pow((g + 0.055f) / 1.055f, 2.4f);
+            float B = b < 0.03928f ? b / 12.92f : Mathf.Pow((b + 0.055f) / 1.055f, 2.4f);
+            return 0.2126f * R + 0.7152f * G + 0.0722f * B;
         }
     }
 }
