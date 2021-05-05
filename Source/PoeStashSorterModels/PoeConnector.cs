@@ -68,7 +68,7 @@ namespace POEStashSorterModels
 
         public static List<Character> FetchCharacters()
         {
-            string jsonData = server.WebClient.DownloadString(server.CharacterUrl);
+            string jsonData = server.WebClient.DownloadString(string.Format(server.CharacterUrl, accountName));
             if (jsonData == "false")
                 throw new CharacterInfoException();
             var characters = JsonConvert.DeserializeObject<List<Character>>(jsonData);

@@ -19,12 +19,12 @@ namespace PoeStashSorterModels.Servers
 
         protected virtual string SessionIdName => "POESESSID";
 
-        public virtual string CharacterUrl => $"http://{Domain}/character-window/get-characters";
+        public virtual string CharacterUrl => $"http://{Domain}/character-window/get-characters?accountName={{0}}";
 
         protected virtual string MyAccountUrl => $"https://{Domain}/my-account";
 
         public virtual string StashUrl =>
-            $"http://{Domain}/character-window/get-stash-items?accountName={{0}}&league={{1}}&tabs=1&tabIndex={{2}}";
+            $"https://{Domain}/character-window/get-stash-items?accountName={{0}}&league={{1}}&tabs=1&tabIndex={{2}}";
 
         public virtual string EmailLoginName => "Email";
 
