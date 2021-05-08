@@ -320,7 +320,25 @@ namespace POEStashSorterModels
                     {
                         WebClient client = new WebClient();
                         client.BaseAddress = PoeConnector.server.Url;
-                        byte[] imageData = client.DownloadData(this.Icon);
+                        int maxRetries = 3;
+                        int retries = 0;
+                        byte[] imageData = null;
+                        while (retries < maxRetries)
+                        {
+                            try
+                            {
+                                imageData = client.DownloadData(this.Icon);
+                                break;
+                            }
+                            catch {
+                                retries++;
+                                Console.WriteLine("Failed downloading icon. Retrying...({0})", retries);
+                            }
+                        }
+                        if (imageData == null)
+                        {
+                            return;
+                        }
                         PoeSorter.Dispatcher.Invoke(() =>
                         {
                             BitmapImage bitmap = new BitmapImage();
@@ -332,7 +350,7 @@ namespace POEStashSorterModels
 
                             this.image.Source = bitmap;
 
-                            if (this.GemRequirement == POEStashSorterModels.GemRequirement.None && this.ItemType == POEStashSorterModels.ItemType.Gem)
+                            if (this.ItemType == POEStashSorterModels.ItemType.Gem && this.GemRequirement == POEStashSorterModels.GemRequirement.None)
                                 if (HardCodedGemColorInfo.ContainsKey(this.FullItemName) == false)
                                     ScanGemImage(bitmap);
                             //if (Tab.IsSelected)
@@ -693,7 +711,6 @@ namespace POEStashSorterModels
                 float textLuminance = CalculateLuminance(light);
                 float ratio = tabLuminance > textLuminance ? ((tabLuminance + 0.05f) / (textLuminance + 0.05f)) : ((textLuminance + 0.05f) / (tabLuminance + 0.05f));
                 float min = 7f;
-                Console.WriteLine(ratio);
                 return new SolidColorBrush(ratio < min ? dark : light);
             }
         }
