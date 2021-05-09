@@ -27,17 +27,16 @@ namespace POEStashSorterModels
             const int swRestore = 9;
             Process[] arrProcesses;
 
-            string[] processNameArray = 
-                {
-                    "PathOfExile"
-                    ,"PathOfExile.exe"
-                    ,"PathOfExile_x64"
-                    ,"PathOfExile_x64.exe"
-                    ,"PathOfExileSteam"
-                    ,"PathOfExileSteam.exe"
-                    ,"PathOfExile_x64Steam"
-                    ,"PathOfExile_x64Steam.exe"
-                };
+            string[] processNameArray = {
+                "PathOfExile",
+                "PathOfExile.exe",
+                "PathOfExile_x64",
+                "PathOfExile_x64.exe",
+                "PathOfExileSteam",
+                "PathOfExileSteam.exe",
+                "PathOfExile_x64Steam",
+                "PathOfExile_x64Steam.exe",
+            };
 
             foreach (string processName in processNameArray)
             {

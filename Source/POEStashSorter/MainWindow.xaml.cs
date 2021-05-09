@@ -124,6 +124,8 @@ namespace POEStashSorter
             {
                 new StashPosSize("Auto"),
                 new StashPosSize("Auto(IR)", "Auto (Image Recognition)"),
+                new StashPosSize(2560, 1440, new Rectangle(23, 179, 842, 843)),
+                new StashPosSize(1920, 1080, new Rectangle(12, 132, 632, 631)),
                 new StashPosSize(1600, 900, new Rectangle(12, 132, 540, 661)),
                 new StashPosSize(1499, 900, new Rectangle(11, 132, 506, 661)),
                 new StashPosSize(1366, 768, new Rectangle(10, 113, 461, 564)),
@@ -172,10 +174,19 @@ namespace POEStashSorter
             interruptEvent.Isinterrupted =  false;
             RegisterHotKey(handle, 9999, 0, ESCAPE);
             await Task.Delay(300);
-            var stashSize = (StashPosSize) cbStashSize.SelectedValue;
-            await Task.Run(() => PoeSorter.StartSorting(interruptEvent, stashSize));
-            Unregistered();
-            BackToFront();
+            var stashSize = (StashPosSize) cbStashSize.SelectedItem;
+            try
+            {
+                await Task.Run(() => PoeSorter.StartSorting(interruptEvent, stashSize));
+                Unregistered();
+                BackToFront();
+            } catch (Exception ex)
+            {
+                Unregistered();
+                BackToFront();
+                if (ex.Message != "Interrupted")
+                    MessageBox.Show(ex.Message);
+            }
         }
 
         private void BackToFront()

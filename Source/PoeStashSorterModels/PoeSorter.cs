@@ -228,7 +228,6 @@ namespace POEStashSorterModels
                 SelectedTab.Items.ForEach(x => ItemCanvas.Children.Add(x.Image));
                 SelectedTabSorted.Items.ForEach(x => ItemCanvas.Children.Add(x.Image));
 
-
             }
             init = true;
         }

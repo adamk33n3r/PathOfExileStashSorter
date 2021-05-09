@@ -72,8 +72,8 @@
 
 
         <Image HorizontalAlignment="Left" Width="47" Source="Images/Seperator.png" Height="569" VerticalAlignment="Top" Margin="570,100,0,0"/>
-        <Image x:Name="imgLeftStash" HorizontalAlignment="Left" Width="570" Source="Images/EmptyStash.png" Height="569" VerticalAlignment="Top" Margin="0,100,0,0"/>
-        <Image x:Name="imgRightStash" HorizontalAlignment="Left" Width="570" Source="Images/EmptyStash.png" Height="572" VerticalAlignment="Top" Margin="617,100,0,0"/>
+        <Image x:Name="imgLeftStash" HorizontalAlignment="Left" Width="570" Source="Images/EmptyQuadStash.png" Height="569" VerticalAlignment="Top" Margin="0,100,0,0"/>
+        <Image x:Name="imgRightStash" HorizontalAlignment="Left" Width="570" Source="Images/EmptyQuadStash.png" Height="572" VerticalAlignment="Top" Margin="617,100,0,0"/>
         <ComboBox x:Name="ddlLeague" HorizontalAlignment="Left" Margin="57,13,0,0" VerticalAlignment="Top" Width="170" SelectionChanged="ddlLeague_SelectionChanged"/>
         <Label Content="League" HorizontalAlignment="Left" Margin="4,9,0,0" VerticalAlignment="Top" Foreground="#FFB0B0B0"/>
         <Label Content="Sort mode" HorizontalAlignment="Left" Margin="264,9,0,0" VerticalAlignment="Top" Foreground="#FFB0B0B0"/>

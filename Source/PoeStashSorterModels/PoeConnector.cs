@@ -19,6 +19,7 @@ namespace POEStashSorterModels
         private static List<string> supportedTabTypes = new List<string>() {
             "NormalStash",
             "PremiumStash",
+            "QuadStash",
         };
        
         public static void Connect(Server server, string email, string password, bool useSessionId = false)

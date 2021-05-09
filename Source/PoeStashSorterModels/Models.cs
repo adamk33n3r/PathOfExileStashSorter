@@ -287,10 +287,11 @@ namespace POEStashSorterModels
                 if (image == null)
                 {
                     image = new Image();
-                    image.Width = 43 * this.W;
-                    image.Height = 43 * this.H;
-                    image.Stretch = Stretch.None;
-                    image.Margin = new Thickness(this.X * 47.4f + 2.2f, this.Y * 47.4f + 2.2f, 0, 0);
+                    int divisor = Tab.Type == "QuadStash" ? 2 : 1;
+                    image.Width = 46 * this.W / divisor;
+                    image.Height = 46 * this.H / divisor;
+                    image.Stretch = Stretch.Uniform;
+                    image.Margin = new Thickness((this.X * 47.4f + 2.2f) / divisor, (this.Y * 47.4f + 2.2f) / divisor, 0, 0);
                     DownloadImageAsync();
                 }
                 return image;
@@ -468,10 +469,13 @@ namespace POEStashSorterModels
             clone.CosmeticMods = this.CosmeticMods;
             clone.Tab = this.Tab;
 
-            clone.image = new Image();
-            clone.image.Width = 43 * this.W;
-            clone.image.Stretch = Stretch.None;
-            clone.image.Height = 43 * this.H;
+            clone.image = new Image
+            {
+                Width = Image.Width,
+                Height = Image.Height,
+                Stretch = Image.Stretch,
+                //Margin = Image.Margin,
+            };
             double offsetX = 47.4 * 13;
             clone.image.Margin = new Thickness(this.X * 47.4f + 2.2f + offsetX, this.Y * 47.4f + 2.2f, 0, 0);
             clone.DownloadImageAsync();
@@ -701,11 +705,19 @@ namespace POEStashSorterModels
 
         public League League { get; set; }
 
+        public int Size
+        {
+            get
+            {
+                return Type == "QuadStash" ? 24 : 12;
+            }
+        }
+
         public SolidColorBrush TextColor
         {
             get
             {
-                Color light = Color.FromRgb(0xff, 0xff, 0xff);
+                Color light = Color.FromRgb(0xd8, 0xa2, 0x62);
                 Color dark = Color.FromRgb(0x21, 0x25, 0x29);
                 float tabLuminance = CalculateLuminance(Colour);
                 float textLuminance = CalculateLuminance(light);

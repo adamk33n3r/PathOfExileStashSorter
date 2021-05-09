@@ -60,15 +60,17 @@ namespace POEStashSorterModels
             sortedTab.srcC = tab.srcC;
             sortedTab.srcL = tab.srcL;
             sortedTab.srcR = tab.srcR;
+            sortedTab.Type = tab.Type;
             sortedTab.Items = tab.Items.Select(item => item.CloneItem()).ToList();
 
 
             Sort(sortedTab, SortOption);
 
+            int divisor = tab.Type == "QuadStash" ? 2 : 1;
+            double offsetX = 47.4 * 13;
             foreach (var item in sortedTab.Items)
             {
-                double offsetX = 47.4 * 13;
-                item.Image.Margin = new Thickness(item.X * 47.4f + 2.2f + offsetX, item.Y * 47.4f + 2.2f, 0, 0);
+                item.Image.Margin = new Thickness((item.X * 47.4f + 2.2f) / divisor + offsetX, (item.Y * 47.4f + 2.2f) / divisor, 0, 0);
             }
 
             return sortedTab;
@@ -85,26 +87,26 @@ namespace POEStashSorterModels
 
         private void CalcStashDimensions(StartSortingParams sortingParams)
         {
-            const int CELL_COUNT_X = 12;
+            int CELL_COUNT_X = sortingParams.UnsortedTab.Type == "QuadStash" ? 24 : 12;
             WinApi.Rect rect = ApplicationHelper.PathOfExileDimensions;
 
             float startX, startY;
             if (sortingParams.StashPosSize.Text == "Auto")
             {
-                cellHeight = rect.Bottom * 0.0484f;
-                startX = rect.Bottom * 0.033f - cellHeight / 2.0f;
-                startY = rect.Bottom * 0.1783f - cellHeight / 2.0f - (Settings.Instance.GetSortingAlgorithmForTab(PoeSorter.SelectedTab).IsInFolder ? 0 : cellHeight / 2.0f);
+                cellHeight = rect.Bottom * 0.0484f / (CELL_COUNT_X / 12);
+                startX = rect.Bottom * 0.0167f;// + cellHeight / 2.0f;
+                startY = rect.Bottom * 0.1243f/* + cellHeight / 2.0f*/ + (Settings.Instance.GetSortingAlgorithmForTab(PoeSorter.SelectedTab).IsInFolder ? cellHeight / 2.0f : 0);
             }
             else
             {
                 // TODO: Fix the rectangle detection in non-folders
                 var stashRectangle = sortingParams.StashPosSize.Text == "Auto(IR)"
-                    ? GetStashRectangleViaImageRecognition(rect)
+                    ? GetStashRectangleViaImageRecognition(sortingParams, rect)
                     : SetScreenSize(sortingParams, ref rect);
 
                 cellHeight = (float)stashRectangle.Width / CELL_COUNT_X;
-                startX = stashRectangle.Left + cellHeight / 2.0f;
-                startY = stashRectangle.Top + cellHeight / 2.0f;
+                startX = stashRectangle.Left;// + cellHeight / 2.0f;
+                startY = stashRectangle.Top;// + cellHeight / 2.0f;
             }
 
             cellWidth = cellHeight;
@@ -139,28 +141,50 @@ namespace POEStashSorterModels
             }
         }
 
-        private static Rectangle GetStashRectangleViaImageRecognition(WinApi.Rect rect)
+        private static Rectangle GetStashRectangleViaImageRecognition(StartSortingParams sortingParams, WinApi.Rect rect)
         {
-            using (Bitmap img = new Bitmap(rect.Right/2, rect.Bottom))
+            using (Bitmap img = new Bitmap(rect.Right/2, rect.Bottom, System.Drawing.Imaging.PixelFormat.Format24bppRgb))
             {
                 using (Graphics g = Graphics.FromImage(img))
                 {
                     g.CopyFromScreen(rect.Left, rect.Top, 0, 0, img.Size, CopyPixelOperation.SourceCopy);
                 }
-                //img.Save(@"C:\Users\adamg\444.png", System.Drawing.Imaging.ImageFormat.Png);
-                var colorFilter = new ColorFiltering();
-                colorFilter.Red = new IntRange(0, 65);
-                colorFilter.Green = new IntRange(0, 65);
-                colorFilter.Blue = new IntRange(0, 65);
-                colorFilter.FillOutsideRange = false;
+                img.Save(@"C:\Users\adamg\screen.png", System.Drawing.Imaging.ImageFormat.Png);
+
+                //var etm = new ExhaustiveTemplateMatching(0.95f);
+                //var tmp = new Bitmap(@"StashBorderBottom.bmp");
+                //int div = 4;
+                //var matches = etm.ProcessImage(new ResizeNearestNeighbor(img.Width / div, img.Height / div).Apply(img), new ResizeNearestNeighbor(tmp.Width / div, tmp.Height / div).Apply(tmp));
+                //if (matches.Length > 0)
+                //{
+                //    var borderRect = matches[0].Rectangle;
+                //    borderRect.X *= div;
+                //    borderRect.Y *= div;
+                //    Console.WriteLine("Matched border at: {0}", borderRect);
+                //} else
+                //{
+                //    Console.WriteLine("no border found");
+                //}
+
+                var tabColor = sortingParams.UnsortedTab.Colour;
+                var colorFilter = new ColorFiltering
+                {
+                    Red = new IntRange(Mathf.Clamp(tabColor.R - 50, 0, 0xff), Mathf.Clamp(tabColor.R + 0, 0, 0xff)),
+                    Green = new IntRange(Mathf.Clamp(tabColor.G - 50, 0, 0xff), Mathf.Clamp(tabColor.G + 0, 0, 0xff)),
+                    Blue = new IntRange(Mathf.Clamp(tabColor.B - 50, 0, 0xff), Mathf.Clamp(tabColor.B + 0, 0, 0xff)),
+                    //Red = new IntRange()
+                    FillOutsideRange = true,
+                };
 
                 colorFilter.ApplyInPlace(img);
-                
-                var blobCounter = new BlobCounter();
+                img.Save(@"C:\Users\adamg\filtered.png", System.Drawing.Imaging.ImageFormat.Png);
 
-                blobCounter.FilterBlobs = true;
-                blobCounter.MinHeight = 50;
-                blobCounter.MinWidth = 50;
+                var blobCounter = new BlobCounter
+                {
+                    FilterBlobs = true,
+                    MinHeight = 200,
+                    MinWidth = 200,
+                };
 
                 blobCounter.ProcessImage(img);
                 Blob[] blobs = blobCounter.GetObjectsInformation();
@@ -168,23 +192,21 @@ namespace POEStashSorterModels
                 foreach (var blob in blobs)
                 {
                     var edgePoints = blobCounter.GetBlobsEdgePoints(blob);
-                    List<IntPoint> cornerPoints;
 
-                    if (shapeChecker.IsQuadrilateral(edgePoints, out cornerPoints))
+                    if (shapeChecker.IsQuadrilateral(edgePoints, out List<IntPoint> cornerPoints))
                     {
                         if (shapeChecker.CheckPolygonSubType(cornerPoints) == PolygonSubType.Square)
                         {
                             var rectangle = new Rectangle(cornerPoints[0].X, cornerPoints[1].Y, cornerPoints[1].X - cornerPoints[0].X, cornerPoints[2].Y - cornerPoints[1].Y);
                             if (rectangle.Width < 200 || rectangle.Height < 200)
                                 continue;
-                            //Graphics g = Graphics.FromImage(img);
-                            //g.DrawRectangle(new Pen(Color.Red), rectangle);
-                            //img.Save(@"C:\Users\adamg\result.png");
+                            Graphics g = Graphics.FromImage(img);
+                            g.DrawRectangle(new Pen(Color.Red, 2), rectangle);
+                            img.Save(@"C:\Users\adamg\result.png");
                             return rectangle;
                         }
                     }
                 }
-
             }
             throw new Exception("Stash hasn't been found");
         }
@@ -228,6 +250,7 @@ namespace POEStashSorterModels
             try
             {
                 ApplicationHelper.OpenPathOfExile();
+                Thread.Sleep(100);
                 List<Item> unsortedItems = sortingParams.UnsortedTab.Items.Where(
                     x => sortingParams.SortedTab.Items.Any(
                         c => c.Id == x.Id && c.X == x.X && x.Y == c.Y) == false
@@ -242,10 +265,13 @@ namespace POEStashSorterModels
 
                     if (unsortedItem != null)
                     {
-                        MouseTools.MoveCursor(MouseTools.GetMousePosition(), new Vector2(
-                            startPos.X + unsortedItem.X * cellWidth,
-                            startPos.Y + unsortedItem.Y * cellHeight
-                        ), 20);
+                        //Console.WriteLine("going to unsorted item: {0} at: {1}, {2}", unsortedItem.FullItemName, unsortedItem.X, unsortedItem.Y);
+                        //Vector2 startingMouse = new Vector2(
+                        //    startPos.X + unsortedItem.X * cellWidth,
+                        //    startPos.Y + unsortedItem.Y * cellHeight
+                        //);
+                        //MouseTools.MoveCursor(MouseTools.GetMousePosition(), startingMouse, 20);
+                        //        throw new Exception("Interrupted");
                         bool selectGem = true;
 
                         while (unsortedItem != null)
@@ -264,7 +290,7 @@ namespace POEStashSorterModels
                                 startPos.X + (sortedItem.X + sortedItem.W / 2f) * cellWidth,
                                 startPos.Y + (sortedItem.Y + sortedItem.H / 2f) * cellHeight
                             );
-                            // Log.Message("Moving " + unsortedItem.Name + " from " + unsortedItem.X + "," + unsortedItem.Y + " to " + sortedItem.X + "," + sortedItem.Y);
+                            Console.WriteLine("Moving " + unsortedItem.Name + " from " + unsortedItem.X + "," + unsortedItem.Y + " to " + sortedItem.X + "," + sortedItem.Y);
 
                             List<Item> itemsInTargetSpace = unsortedItems.Where(
                                 item => item != unsortedItem && ItemOverlap(item, sortedItem)
@@ -301,7 +327,7 @@ namespace POEStashSorterModels
                             //remove unsorted now that it is sorted
                             unsortedItems.Remove(unsortedItem);
 
-                            //if there wassent a item where the item was placed
+                            //if there was an item where the item was placed
                             if (itemsInTargetSpace.Count == 1)
                             {
                                 unsortedItem = itemsInTargetSpace[0];
@@ -322,7 +348,7 @@ namespace POEStashSorterModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                throw ex;
             }
             finally
             {

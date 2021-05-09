@@ -16,5 +16,10 @@ namespace POEStashSorterModels
             this.Y = y;
         }
 
+        public override string ToString()
+        {
+            return "(" + X + ", " + Y + ")";
+        }
+
     }
 }

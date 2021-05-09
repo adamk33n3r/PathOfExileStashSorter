@@ -51,6 +51,8 @@ namespace POEStashSorter
             CbComboBox.DisplayMemberPath = "Name";
             CbComboBox.SelectedIndex = Settings.Instance.ServerID;
             originalHeight = Height;
+
+            btnLogin_Click(null, null);
         }
 
 
