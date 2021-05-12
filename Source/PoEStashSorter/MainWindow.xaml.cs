@@ -164,7 +164,11 @@ namespace PoEStashSorter
 
         private void StashTabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            PoeSorter.SetSelectedTab((Tab)StashTabs.SelectedItem);
+            Tab tab = (Tab)StashTabs.SelectedItem;
+            PoeSorter.SetSelectedTab(tab);
+            string bgPath = tab.IsQuad ? @"Images/EmptyQuadStash.png" : @"Images/EmptyStash.png";
+            BitmapImage bg = new BitmapImage(new Uri(bgPath, UriKind.Relative));
+            imgLeftStash.Source = imgRightStash.Source = bg;
         }
 
         private async void StartSorting_Click(object sender, RoutedEventArgs e)

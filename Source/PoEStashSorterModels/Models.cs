@@ -181,9 +181,9 @@ namespace PoEStashSorterModels
             get
             {
                 if (this.FrameType == 4)
-                    return PoEStashSorterModels.ItemType.Gem;
+                    return ItemType.Gem;
 
-                //TODO determen the item type
+                //TODO determine the item type
 
                 return ItemType.Gear;
             }
@@ -288,7 +288,7 @@ namespace PoEStashSorterModels
                 if (image == null)
                 {
                     image = new Image();
-                    int divisor = Tab.Type == "QuadStash" ? 2 : 1;
+                    int divisor = Tab.IsQuad ? 2 : 1;
                     image.Width = 46 * this.W / divisor;
                     image.Height = 46 * this.H / divisor;
                     image.Stretch = Stretch.Uniform;
@@ -683,11 +683,16 @@ namespace PoEStashSorterModels
 
         public League League { get; set; }
 
+        public bool IsQuad
+        {
+            get { return Type == "QuadStash"; }
+        }
+
         public int Size
         {
             get
             {
-                return Type == "QuadStash" ? 24 : 12;
+                return IsQuad ? 24 : 12;
             }
         }
 

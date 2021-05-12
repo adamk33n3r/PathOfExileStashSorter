@@ -66,7 +66,7 @@ namespace PoEStashSorterModels
 
             Sort(sortedTab, SortOption);
 
-            int divisor = tab.Type == "QuadStash" ? 2 : 1;
+            int divisor = tab.IsQuad ? 2 : 1;
             double offsetX = 47.4 * 13;
             foreach (var item in sortedTab.Items)
             {
@@ -87,26 +87,26 @@ namespace PoEStashSorterModels
 
         private void CalcStashDimensions(StartSortingParams sortingParams)
         {
-            int CELL_COUNT_X = sortingParams.UnsortedTab.Type == "QuadStash" ? 24 : 12;
+            int CELL_COUNT_X = sortingParams.UnsortedTab.Size;
             WinApi.Rect rect = ApplicationHelper.PathOfExileDimensions;
 
             float startX, startY;
             if (sortingParams.StashPosSize.Text == "Auto")
             {
                 cellHeight = rect.Bottom * 0.0484f / (CELL_COUNT_X / 12);
-                startX = rect.Bottom * 0.0167f;// + cellHeight / 2.0f;
-                startY = rect.Bottom * 0.1243f/* + cellHeight / 2.0f*/ + (Settings.Instance.GetSortingAlgorithmForTab(PoeSorter.SelectedTab).IsInFolder ? cellHeight / 2.0f : 0);
+                startX = rect.Bottom * 0.0167f;
+                startY = rect.Bottom * 0.1243f + (Settings.Instance.GetSortingAlgorithmForTab(PoeSorter.SelectedTab).IsInFolder ? cellHeight / 2.0f : 0);
             }
             else
             {
-                // TODO: Fix the rectangle detection in non-folders
+                // TODO: Fix the rectangle detection in dark colors
                 var stashRectangle = sortingParams.StashPosSize.Text == "Auto(IR)"
                     ? GetStashRectangleViaImageRecognition(sortingParams, rect)
                     : SetScreenSize(sortingParams, ref rect);
 
                 cellHeight = (float)stashRectangle.Width / CELL_COUNT_X;
-                startX = stashRectangle.Left;// + cellHeight / 2.0f;
-                startY = stashRectangle.Top;// + cellHeight / 2.0f;
+                startX = stashRectangle.Left;
+                startY = stashRectangle.Top;
             }
 
             cellWidth = cellHeight;
