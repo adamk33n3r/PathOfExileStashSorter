@@ -15,7 +15,7 @@ public class SortBelts : SortingAlgorithm
     {
         if (options["Default"])
         {
-            sortItems(tab, 12);
+            sortItems(tab, tab.Size);
         }
         // if (options["Dynamic"])
         // {
@@ -27,7 +27,7 @@ public class SortBelts : SortingAlgorithm
     void sortItems(Tab tab, int numberOfColumns)
     {
         // Sort items of `tab` by accessing `tab.Items` and 
-        // setting each items's `.x` and `.y` to the new location.
+        // setting each item's `.x` and `.y` to the new location.
 
         int numberOfItems = tab.Items.Count();
         if (numberOfItems < 1)
@@ -36,8 +36,8 @@ public class SortBelts : SortingAlgorithm
         }
 
         // starting position
-        int x = 11;
-        int y = 11;
+        int x = tab.Size - 1;
+        int y = x;
 
         var itemQueue = tab.Items
             .OrderByDescending(item => item.Category)
@@ -80,12 +80,12 @@ public class SortBelts : SortingAlgorithm
 
             // we advance to the next row if we run out of space,
             // OR if new base item and enough space
-            int emptyColumns = (12 - numberOfColumns);
+            int emptyColumns = (tab.Size - numberOfColumns);
             int remainingXSpace = 1 + x - emptyColumns;
 
             if (remainingXSpace < item.W || canSkip && maySkip)
             {
-                x = 11;
+                x = tab.Size - 1;
                 y -= rowHeight;
                 rowHeight = 1;
             }

@@ -213,6 +213,9 @@ namespace PoEStashSorterModels
         [JsonProperty(PropertyName = "typeLine")]
         public string TypeLine { get; set; }
 
+        [JsonProperty(PropertyName = "baseType")]
+        public string BaseType { get; set; }
+
         [JsonProperty(PropertyName = "identified")]
         public bool Identified { get; set; }
 
@@ -422,6 +425,7 @@ namespace PoEStashSorterModels
             clone.League = this.League;
             clone.Name = this.Name;
             clone.TypeLine = this.TypeLine;
+            clone.BaseType = this.BaseType;
             clone.Identified = this.Identified;
             clone.Properties = this.Properties;
             clone.ExplicitMods = this.ExplicitMods;
@@ -536,6 +540,30 @@ namespace PoEStashSorterModels
                 }
 
                 return 0;
+            }
+        }
+
+        public string FlaskType
+        {
+            get
+            {
+                if (Category != "Flask")
+                {
+                    return null;
+                }
+                if (BaseType.Contains("Life"))
+                {
+                    return "Life";
+                }
+                if (BaseType.Contains("Mana"))
+                {
+                    return "Mana";
+                }
+                if (BaseType.Contains("Hybrid"))
+                {
+                    return "Hybrid";
+                }
+                return "Utility";
             }
         }
 
