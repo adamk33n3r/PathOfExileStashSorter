@@ -8,6 +8,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="StylesTemplate.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            <FontFamily x:Key="DefaultFont">/PoEStashSorter;component/Fonts/#Fontin SmallCaps</FontFamily>
         </ResourceDictionary>
 
     </Application.Resources>

@@ -35,11 +35,11 @@ public class Compact : SortingAlgorithm
 
     void Drop(Tab tab)
     {
-        Console.WriteLine("\n\n");
-        Console.WriteLine("------------");
-        Console.WriteLine("Drop Sorting");
-        Console.WriteLine(tab.Size);
-        Console.WriteLine("------------");
+        //Console.WriteLine("\n\n");
+        //Console.WriteLine("------------");
+        //Console.WriteLine("Drop Sorting");
+        //Console.WriteLine(tab.Size);
+        //Console.WriteLine("------------");
         var itemQueue = tab.Items
             // Important to compacting
             .OrderByDescending(item => item.H * item.W)
@@ -70,21 +70,21 @@ public class Compact : SortingAlgorithm
                 continue;
             }
 
-            Console.WriteLine(string.Join(", ", heightMap));
+            //Console.WriteLine(string.Join(", ", heightMap));
             var ordered = heightMap.OrderBy(yx => yx.Value).ThenBy(yx => yx.Key).Where(yx => yx.Key + item.H <= tab.Size);
             var bestPos = ordered.First();
-            Console.WriteLine(string.Join(", ", ordered));
+            //Console.WriteLine(string.Join(", ", ordered));
             //x = heightMap.GetValueOrDefault(y, 0);
             item.X = bestPos.Value;
             item.Y = bestPos.Key;
 
             if (item.X > prevCol)
             {
-                Console.WriteLine("moved to next col. checking if we left space");
+                //Console.WriteLine("moved to next col. checking if we left space");
                 // Check if we left space in previous column
-                Console.WriteLine("{0}, {1}", prevItem.Y, prevItem.H);
+                //Console.WriteLine("{0}, {1}", prevItem.Y, prevItem.H);
                 int spaceLeft = tab.Size - (prevItem.Y + prevItem.H);
-                Console.WriteLine("space left: " + spaceLeft);
+                //Console.WriteLine("space left: " + spaceLeft);
                 if (heightMap.GetValueOrDefault(prevItem.Y + prevItem.H, tab.Size) <= prevItem.X && spaceLeft > 0)
                 {
                     var itemsThatFitInSpace = itemQueue.Skip(j + 1).Where(other => !used.Any(oo => oo == other)).Where(other => other.H <= spaceLeft).Where(other => other.W <= prevItem.W);
@@ -105,7 +105,7 @@ public class Compact : SortingAlgorithm
                     }
                     for (int i = 0; i < spaceLeft; i++)
                     {
-                        Console.WriteLine(prevItem.Y + prevItem.H + i);
+                        //Console.WriteLine(prevItem.Y + prevItem.H + i);
                         //if (prevItem.Y + prevItem.H + i >= tab.Size)
                         //    break;
                         heightMap[prevItem.Y + prevItem.H + i] += prevItem.W;
@@ -124,16 +124,16 @@ public class Compact : SortingAlgorithm
                 // Might be wrong if there is overhang but there shouldn't be any overhang...?
                 heightMap[i] += item.W;
             }
-            Console.WriteLine(string.Join(", ", heightMap));
-            Console.WriteLine("({0}) {1}: {2}, {3}", j, item.FullItemName, item.X, item.Y);
+            //Console.WriteLine(string.Join(", ", heightMap));
+            //Console.WriteLine("({0}) {1}: {2}, {3}", j, item.FullItemName, item.X, item.Y);
             prevCol = item.X;
             prevItem = item;
             j++;
             //if (j == 2)
             //    break;
         }
-        Console.WriteLine("Used {0} items to fill in gaps", used.Count);
-        Console.WriteLine(string.Join(", ", used.Select(u => u.FullItemName)));
+        //Console.WriteLine("Used {0} items to fill in gaps", used.Count);
+        //Console.WriteLine(string.Join(", ", used.Select(u => u.FullItemName)));
     }
 
     void CompactItems(Tab tab)

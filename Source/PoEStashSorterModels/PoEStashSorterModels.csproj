@@ -92,7 +92,7 @@
     <Compile Include="CookieAwareWebClient.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="DictionaryExtensions.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="Direction.cs" />
     <Compile Include="Exceptions\CharacterInfoException.cs" />
     <Compile Include="Exceptions\DownloadFailedException.cs" />

@@ -48,6 +48,9 @@ namespace PoEStashSorterModels
         [XmlElement(Order = 5)]
         public string LastSelectedLeague { get; set; }
 
+        [XmlElement(Order = 10)]
+        public string LastTab { get; set; }
+
         [XmlElement(Order = 3)]
         public List<SortingAlgorithmInfo> SortingAlgorithmInfos = new List<SortingAlgorithmInfo>();
 

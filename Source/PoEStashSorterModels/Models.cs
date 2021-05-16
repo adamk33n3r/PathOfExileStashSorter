@@ -31,8 +31,25 @@ namespace PoEStashSorterModels
         public List<List<object>> Values { get; set; }
 
         [JsonProperty(PropertyName = "displayMode")]
-        public int DisplayMode { get; set; }
+        public DisplayMode DisplayMode { get; set; }
     }
+
+    [DataContract]
+    public class AdditionalProperty
+    {
+        [JsonProperty(PropertyName = "name")]
+        public string Name { get; set; }
+
+        [JsonProperty(PropertyName = "values")]
+        public List<List<object>> Values { get; set; }
+
+        [JsonProperty(PropertyName = "displayMode")]
+        public int DisplayMode { get; set; }
+
+        [JsonProperty(PropertyName = "progress")]
+        public double Progress { get; set; }
+    }
+
 
     public class League
     {
@@ -55,32 +72,37 @@ namespace PoEStashSorterModels
     }
 
     [DataContract]
-    public class AdditionalProperty
-    {
-        [JsonProperty(PropertyName = "name")]
-        public string name { get; set; }
-
-        [JsonProperty(PropertyName = "values")]
-        public List<List<object>> values { get; set; }
-
-        [JsonProperty(PropertyName = "displayMode")]
-        public int displayMode { get; set; }
-
-        [JsonProperty(PropertyName = "progress")]
-        public double progress { get; set; }
-    }
-
-    [DataContract]
     public class Requirement
     {
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
 
         [JsonProperty(PropertyName = "values")]
-        public List<List<object>> Value { get; set; }
+        public List<List<object>> Values { get; set; }
 
         [JsonProperty(PropertyName = "displayMode")]
-        public int DisplayMode { get; set; }
+        public DisplayMode DisplayMode { get; set; }
+    }
+
+    public class TooltipImages {
+        public BitmapImage Left;
+        public BitmapImage Middle;
+        public BitmapImage Right;
+        public BitmapImage Separator;
+    }
+
+    public enum FrameType
+    {
+        Normal = 0,
+        Magic = 1,
+        Rare = 2,
+        Unique = 3,
+        Gem = 4,
+        Currency = 5,
+        DivinationCard = 6,
+        QuestItem = 7,
+        Prophecy = 8,
+        Relic = 9,
     }
 
     public enum ItemType
@@ -91,6 +113,14 @@ namespace PoEStashSorterModels
         Ring,
         Currency,
         Amulet
+    }
+
+    public enum DisplayMode
+    {
+        ColonSep = 0,
+        SpaceSep = 1,
+        Progress = 2,
+        Formatted = 3,
     }
 
     [DataContract]
@@ -131,7 +161,7 @@ namespace PoEStashSorterModels
                 {
                     Requirement topRequirement = Requirements
                                     .Where(x => x.Name.ToLower() == "dex" || x.Name.ToLower() == "str" || x.Name.ToLower() == "int")
-                                    .OrderByDescending(x => x.Value.Select(c => Convert.ToInt32(c.Max(v => Convert.ToInt32(v)))).Max())
+                                    .OrderByDescending(x => x.Values.Select(c => Convert.ToInt32(c.Max(v => Convert.ToInt32(v)))).Max())
                                     .FirstOrDefault();
 
                     if (topRequirement != null)
@@ -180,11 +210,15 @@ namespace PoEStashSorterModels
         {
             get
             {
-                if (this.FrameType == 4)
-                    return ItemType.Gem;
+                //if (FrameType == FrameType.Gem)
+                //    return ItemType.Gem;
 
                 //TODO determine the item type
 
+                if (Enum.TryParse(Enum.GetName(typeof(FrameType), FrameType), out ItemType itemType))
+                {
+                    return itemType;
+                }
                 return ItemType.Gear;
             }
         }
@@ -220,16 +254,19 @@ namespace PoEStashSorterModels
         public bool Identified { get; set; }
 
         [JsonProperty(PropertyName = "properties")]
-        public List<Property> Properties { get; set; }
+        public List<Property> Properties { get; set; } = new List<Property>();
+
+        [JsonProperty(PropertyName = "utilityMods")]
+        public List<string> UtilityMods { get; set; } = new List<string>();
 
         [JsonProperty(PropertyName = "explicitMods")]
-        public List<string> ExplicitMods { get; set; }
+        public List<string> ExplicitMods { get; set; } = new List<string>();
 
         [JsonProperty(PropertyName = "descrText")]
         public string DescrText { get; set; }
 
         [JsonProperty(PropertyName = "frameType")]
-        public int FrameType { get; set; }
+        public FrameType FrameType { get; set; }
 
         [JsonProperty(PropertyName = "ilvl")]
         public int ItemLevel { get; set; }
@@ -244,28 +281,28 @@ namespace PoEStashSorterModels
         public string InventoryId { get; set; }
 
         [JsonProperty(PropertyName = "socketedItems")]
-        public List<Item> SocketedItems { get; set; }
+        public List<Item> SocketedItems { get; set; } = new List<Item>();
 
         [JsonProperty(PropertyName = "sockets")]
-        public List<Socket> Sockets { get; set; }
+        public List<Socket> Sockets { get; set; } = new List<Socket>();
 
         [JsonProperty(PropertyName = "additionalProperties")]
-        public List<AdditionalProperty> AdditionalProperties { get; set; }
+        public List<AdditionalProperty> AdditionalProperties { get; set; } = new List<AdditionalProperty>();
 
         [JsonProperty(PropertyName = "secDescrText")]
         public string SecDescrText { get; set; }
 
         [JsonProperty(PropertyName = "implicitMods")]
-        public List<string> ImplicitMods { get; set; }
+        public List<string> ImplicitMods { get; set; } = new List<string>();
 
         [JsonProperty(PropertyName = "flavourText")]
-        public List<string> FlavourText { get; set; }
+        public List<string> FlavourText { get; set; } = new List<string>();
 
         [JsonProperty(PropertyName = "requirements")]
-        public List<Requirement> Requirements { get; set; }
+        public List<Requirement> Requirements { get; set; } = new List<Requirement>();
 
         [JsonProperty(PropertyName = "nextLevelRequirements")]
-        public List<Requirement> nextLevelRequirements { get; set; }
+        public List<Requirement> nextLevelRequirements { get; set; } = new List<Requirement>();
 
         [JsonProperty(PropertyName = "socket")]
         public int Socket { get; set; }
@@ -277,7 +314,7 @@ namespace PoEStashSorterModels
         public bool Corrupted { get; set; }
 
         [JsonProperty(PropertyName = "cosmeticMods")]
-        public List<string> CosmeticMods { get; set; }
+        public List<string> CosmeticMods { get; set; } = new List<string>();
 
         private static Dictionary<string, BitmapImage> downloadedImages = new Dictionary<string, BitmapImage>();
         private static Dictionary<string, List<Action<BitmapImage>>> downloadingImages = new Dictionary<string, List<Action<BitmapImage>>>();
@@ -304,6 +341,45 @@ namespace PoEStashSorterModels
             {
                 image = value;
                 DownloadImageAsync();
+            }
+        }
+
+        private TooltipImages tooltipImages;
+        public TooltipImages TooltipImages
+        {
+            get
+            {
+                if (tooltipImages == null)
+                {
+                    var frameTypeMap = new Dictionary<FrameType, string>
+                    {
+                        { FrameType.Normal, "normal" },
+                        { FrameType.Magic, "magic" },
+                        { FrameType.Rare, "rare" },
+                        { FrameType.Unique, "unique" },
+                        { FrameType.Gem, "gem" },
+                        { FrameType.Currency, "currency" },
+                        { FrameType.DivinationCard, "normal" },
+                        { FrameType.QuestItem, "quest" },
+                        { FrameType.Prophecy, "prophecy" },
+                        { FrameType.Relic, "relic" },
+                    };
+                    //single: 29x34
+                    //double: 44x54
+                    string headerFmtUrl = "https://web.poecdn.com/image/item/popup/header-{0}{1}-{2}.png";
+                    bool isDouble = Name != "";
+                    string leftUrl = string.Format(headerFmtUrl, isDouble ? "double-" : "", frameTypeMap[FrameType], "left");
+                    string middleUrl = string.Format(headerFmtUrl, isDouble ? "double-" : "", frameTypeMap[FrameType], "middle");
+                    string rightUrl = string.Format(headerFmtUrl, isDouble ? "double-" : "", frameTypeMap[FrameType], "right");
+                    var sepUrl = string.Format("https://web.poecdn.com/image/item/popup/seperator-{0}.png", frameTypeMap[FrameType]);
+                    tooltipImages = new TooltipImages {
+                        Left = new BitmapImage(new Uri(FileCache.FromUrl(leftUrl))),
+                        Middle = new BitmapImage(new Uri(FileCache.FromUrl(middleUrl))),
+                        Right = new BitmapImage(new Uri(FileCache.FromUrl(rightUrl))),
+                        Separator = new BitmapImage(new Uri(FileCache.FromUrl(sepUrl))),
+                    };
+                }
+                return tooltipImages;
             }
         }
 
@@ -535,7 +611,7 @@ namespace PoEStashSorterModels
                     var lvlReq = this.Requirements.FirstOrDefault(x => x.Name == "Level");
                     if (lvlReq != null)
                     {
-                        return lvlReq.Value.Max(x => Convert.ToInt32(x.Max(c => Convert.ToInt32(c))));
+                        return lvlReq.Values.Max(x => Convert.ToInt32(x.Max(c => Convert.ToInt32(c))));
                     }
                 }
 

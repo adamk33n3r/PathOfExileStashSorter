@@ -132,6 +132,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="TextCollection.cs" />
+    <Compile Include="ItemTooltip.xaml.cs">
+      <DependentUpon>ItemTooltip.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ItemTooltipRow.xaml.cs">
+      <DependentUpon>ItemTooltipRow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="LoginWindow.xaml.cs">
       <DependentUpon>LoginWindow.xaml</DependentUpon>
     </Compile>
@@ -150,6 +157,14 @@
     <Compile Include="SortingAlgorithms\SortMaps.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
+    <Page Include="ItemTooltip.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ItemTooltipRow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="LoginWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -189,6 +204,8 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <Resource Include="Fonts\fontin-regular-webfont.ttf" />
+    <Resource Include="Fonts\fontin-smallcaps-webfont.ttf" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -239,6 +256,19 @@
     <Resource Include="Images\EmptyQuadStash.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\header-normal-left.png" />
+    <Resource Include="Images\header-normal-middle.png" />
+    <Resource Include="Images\header-normal-right.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\header-double-rare-left.png" />
+    <Resource Include="Images\header-double-rare-middle.png" />
+    <Resource Include="Images\header-double-rare-right.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\seperator-rare.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

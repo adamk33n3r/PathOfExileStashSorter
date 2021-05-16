@@ -15,7 +15,6 @@ using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using System.Xml.Linq;
-using PoEStashSorterModels;
 
 namespace PoEStashSorterModels
 {
@@ -27,6 +26,7 @@ namespace PoEStashSorterModels
         private static ComboBox ddlSortOption { get; set; }
         private static CheckBox chkIsInFolder { get; set; }
         public static Canvas ItemCanvas { get; private set; }
+        public static Action<Item> UpdateItemTooltip { get; private set; }
         public static League SelectedLeague
         {
             get
@@ -72,7 +72,7 @@ namespace PoEStashSorterModels
         public static List<SortingAlgorithm> SortingAlgorithms = new List<SortingAlgorithm>();
         public static Dispatcher Dispatcher { get; private set; }
         public static bool Initialized { get; private set; }
-        public static void Initialize(Canvas itemCanvas, Dispatcher dispatcher, ComboBox ddlSortMode, ComboBox ddlSortOption, CheckBox chkIsInFolder)
+        public static void Initialize(Canvas itemCanvas, Action<Item> updateItemTooltip, Dispatcher dispatcher, ComboBox ddlSortMode, ComboBox ddlSortOption, CheckBox chkIsInFolder)
         {
             Initialized = true;
             var sortingAlgorithmsExtern = GetAlgorithmsAssembly()
@@ -95,6 +95,7 @@ namespace PoEStashSorterModels
             PoeSorter.chkIsInFolder = chkIsInFolder;
             PoeSorter.Dispatcher = dispatcher;
             PoeSorter.ItemCanvas = itemCanvas;
+            PoeSorter.UpdateItemTooltip = updateItemTooltip;
             var leagues = PoeConnector.FetchLeagues();
             PoeSorter.Leagues = leagues;
         }
@@ -140,7 +141,7 @@ namespace PoEStashSorterModels
             CompilerParameters parameters = new CompilerParameters();
 
 
-            // refrences all dll files from bin folder
+            // references all dll files from bin folder
             foreach (FileInfo file in (new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory)).GetFiles("*.dll"))
                 parameters.ReferencedAssemblies.Add(file.Name);
 
@@ -196,6 +197,9 @@ namespace PoEStashSorterModels
                 tab.IsSelected = true;
                 SelectedTab = tab;
 
+                Settings.Instance.LastTab = SelectedTab.ID;
+                Settings.Instance.SaveChanges();
+
                 // Download selected tab;
                 if (tab.Items == null)
                     tab.Items = (await PoeConnector.FetchTabAsync(tab.Index, tab.League)).Items;
@@ -211,8 +215,11 @@ namespace PoEStashSorterModels
         }
         static bool init = true;
 
+        static Dictionary<Item, System.Windows.Input.MouseEventHandler> enterEvents = new Dictionary<Item, System.Windows.Input.MouseEventHandler>();
+        static Dictionary<Item, System.Windows.Input.MouseEventHandler> leaveEvents = new Dictionary<Item, System.Windows.Input.MouseEventHandler>();
         private static void SortTab(Tab tab)
         {
+            Console.WriteLine("called SortTab");
             if (init && tab.IsSelected)
             {
                 //Remove old sorted tab preview
@@ -220,15 +227,59 @@ namespace PoEStashSorterModels
                 {
                     SelectedTabSorted.IsSelected = false;
                     //SelectedTabSorted.Items.ForEach(x => ItemCanvas.Children.Remove(x.Image));
+                    Console.WriteLine("clearing children");
                     ItemCanvas.Children.Clear();
                 }
                 SelectedTabSorted = SelectedSortingAlgorithm.SortTab(tab);
 
-                SelectedTab.Items.ForEach(x => ItemCanvas.Children.Add(x.Image));
-                SelectedTabSorted.Items.ForEach(x => ItemCanvas.Children.Add(x.Image));
+                SelectedTab.Items.ForEach(x => {
+                    ItemCanvas.Children.Add(x.Image);
+                    if (enterEvents.ContainsKey(x))
+                    {
+                        x.Image.MouseEnter -= enterEvents[x];
+                    }
+                    enterEvents[x] = (sender, e) => {
+                        UpdateItemTooltip(x);
+                    };
+                    x.Image.MouseEnter += enterEvents[x];
+
+                    if (leaveEvents.ContainsKey(x))
+                    {
+                        x.Image.MouseLeave -= leaveEvents[x];
+                    }
+                    leaveEvents[x] = (sender, e) => {
+                        UpdateItemTooltip(null);
+                    };
+                    x.Image.MouseLeave += leaveEvents[x];
+                });
+                SelectedTabSorted.Items.ForEach(x => {
+                    ItemCanvas.Children.Add(x.Image);
+                    if (enterEvents.ContainsKey(x))
+                    {
+                        x.Image.MouseEnter -= enterEvents[x];
+                    }
+                    enterEvents[x] = (sender, e) => {
+                        UpdateItemTooltip(x);
+                    };
+                    x.Image.MouseEnter += enterEvents[x];
+
+                    if (leaveEvents.ContainsKey(x))
+                    {
+                        x.Image.MouseLeave -= leaveEvents[x];
+                    }
+                    leaveEvents[x] = (sender, e) => {
+                        UpdateItemTooltip(null);
+                    };
+                    x.Image.MouseLeave += leaveEvents[x];
+                });
 
             }
             init = true;
+        }
+
+        private static void Image_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         private static bool selectSortOption = true;

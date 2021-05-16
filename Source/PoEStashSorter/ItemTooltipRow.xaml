@@ -1,0 +1,17 @@
+﻿<UserControl x:Name="userControl" x:Class="PoEStashSorter.ItemTooltipRow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PoEStashSorter"
+             mc:Ignorable="d" 
+             d:DesignHeight="50" d:DesignWidth="375" FontFamily="/PoEStashSorter;component/Fonts/#Fontin SmallCaps">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </UserControl.Resources>
+    <StackPanel>
+        <Image x:Name="Separator" Height="8" Source="Images/seperator-rare.png"/>
+        <!--<Image x:Name="Separator" Height="8" Source="Images/seperator-rare.png" Visibility="{Binding ShowSeparator, Converter={StaticResource BooleanToVisibilityConverter}}"/>-->
+        <TextBlock x:Name="Body" HorizontalAlignment="Center" Margin="0" TextWrapping="Wrap" Foreground="#FF7F7F7F" VerticalAlignment="Top" TextAlignment="Center" FontSize="14"><Run Text="Requires Level"/><Run Text=" "/><Run FontWeight="Bold" Text="69"/><Run Text=","/><Run Text=" "/><Run Foreground="Blue" FontWeight="Bold" Text="420"/><Run Text=" "/><Run Text="Str, "/><Run FontWeight="Bold" Text="120"/><Run Text=" Dex"/></TextBlock>
+    </StackPanel>
+</UserControl>

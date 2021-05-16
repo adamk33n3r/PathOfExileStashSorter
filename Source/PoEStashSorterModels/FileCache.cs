@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace PoEStashSorterModels
 {
-    class FileCache
+    public class FileCache
     {
         private static string cachePath;
         private static string iconCachePath;

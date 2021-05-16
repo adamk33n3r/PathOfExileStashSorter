@@ -20,6 +20,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using static PoEStashSorterModels.WinApi;
 using Rectangle=System.Drawing.Rectangle;
+using Point = System.Windows.Point;
+using System.Windows.Controls.Primitives;
 
 namespace PoEStashSorter
 {
@@ -36,9 +38,29 @@ namespace PoEStashSorter
         public MainWindow()
         {
             InitializeComponent();
+            FrameworkElement.StyleProperty.OverrideMetadata(typeof(Window), new FrameworkPropertyMetadata
+            {
+                DefaultValue = FindResource(typeof(Window))
+            });
             try
             {
-                PoeSorter.Initialize(stashPanel, Dispatcher, ddlSortMode, ddlSortOption, chkIsInFolder);
+                PoeSorter.Initialize(stashPanel, (item) => {
+                    ItemTooltip.UpdateItemData(item);
+                    if (item == null)
+                    {
+                        ItemTooltipPopup.IsOpen = false;
+                        return;
+                    }
+                    ItemTooltipPopup.PlacementTarget = item.Image;
+                    ItemTooltipPopup.Placement = PlacementMode.Custom;
+                    ItemTooltipPopup.CustomPopupPlacementCallback = (Size popupSize, Size targetSize, Point offset) => {
+                        return new CustomPopupPlacement[] {
+                            new CustomPopupPlacement { Point = new Point(-popupSize.Width / 2 + targetSize.Width / 2, -popupSize.Height), PrimaryAxis = PopupPrimaryAxis.Horizontal },
+                            new CustomPopupPlacement { Point = new Point(targetSize.Width, -popupSize.Height / 2 + targetSize.Height / 2), PrimaryAxis = PopupPrimaryAxis.Vertical },
+                        };
+                    };
+                    ItemTooltipPopup.IsOpen = true;
+                }, Dispatcher, ddlSortMode, ddlSortOption, chkIsInFolder);
                 txtSearch.Visibility = Visibility.Hidden;
                 StashTabs.DisplayMemberPath = "Name";
                 ddlSortMode.DisplayMemberPath = "Name";
@@ -152,7 +174,14 @@ namespace PoEStashSorter
         {
             PoeSorter.ChangeLeague((League)ddlLeague.SelectedItem);
             StashTabs.ItemsSource = PoeSorter.SelectedLeague.Tabs;
-            StashTabs.SelectedItem = PoeSorter.SelectedLeague.Tabs.FirstOrDefault();
+            if (Settings.Instance.LastTab != null)
+            {
+                StashTabs.SelectedItem = PoeSorter.SelectedLeague.Tabs.FirstOrDefault(t => t.ID == Settings.Instance.LastTab);
+            }
+            if (StashTabs.SelectedItem == null)
+            {
+                StashTabs.SelectedItem = PoeSorter.SelectedLeague.Tabs.FirstOrDefault();
+            }
         }
 
         private void ListViewScrollViewer_PreviewMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
@@ -166,7 +195,7 @@ namespace PoEStashSorter
         {
             Tab tab = (Tab)StashTabs.SelectedItem;
             PoeSorter.SetSelectedTab(tab);
-            string bgPath = tab.IsQuad ? @"Images/EmptyQuadStash.png" : @"Images/EmptyStash.png";
+            string bgPath = (tab != null && tab.IsQuad) ? @"Images/EmptyQuadStash.png" : @"Images/EmptyStash.png";
             BitmapImage bg = new BitmapImage(new Uri(bgPath, UriKind.Relative));
             imgLeftStash.Source = imgRightStash.Source = bg;
         }
