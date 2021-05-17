@@ -44,6 +44,7 @@ namespace PoEStashSorter
          * 6 = Lightning Damage #FFD700
          * 7 = Chaos Damage #D02090
          */
+
         public ItemTooltip()
         {
             InitializeComponent();
@@ -60,7 +61,10 @@ namespace PoEStashSorter
             Console.WriteLine("Opening tooltip for: {0}", item.FullItemName);
             bool isDouble = item.Name != "";
             HeaderGrid.Height = isDouble ? 54 : 34;
+
+            Name1.Foreground = Name2.Foreground = item.TooltipColor;
             Name2.Visibility = isDouble ? Visibility.Visible : Visibility.Hidden;
+            Name1.Margin = new Thickness(0, isDouble ? -2 : 0, 0, 0);
 
             // Images
             HeaderLeft.Source = item.TooltipImages.Left;

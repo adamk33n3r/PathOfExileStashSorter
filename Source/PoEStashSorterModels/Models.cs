@@ -167,11 +167,11 @@ namespace PoEStashSorterModels
                     if (topRequirement != null)
                     {
                         if (topRequirement.Name.ToLower() == "dex")
-                            return PoEStashSorterModels.GemRequirement.Dex;
+                            return GemRequirement.Dex;
                         if (topRequirement.Name.ToLower() == "int")
-                            return PoEStashSorterModels.GemRequirement.Int;
+                            return GemRequirement.Int;
                         if (topRequirement.Name.ToLower() == "str")
-                            return PoEStashSorterModels.GemRequirement.Str;
+                            return GemRequirement.Str;
                     }
                     else
                     {
@@ -344,6 +344,41 @@ namespace PoEStashSorterModels
             }
         }
 
+        private static readonly Dictionary<FrameType, string> frameTypeMap = new Dictionary<FrameType, string>
+        {
+            { FrameType.Normal, "normal" },
+            { FrameType.Magic, "magic" },
+            { FrameType.Rare, "rare" },
+            { FrameType.Unique, "unique" },
+            { FrameType.Gem, "gem" },
+            { FrameType.Currency, "currency" },
+            { FrameType.DivinationCard, "normal" },
+            { FrameType.QuestItem, "quest" },
+            { FrameType.Prophecy, "prophecy" },
+            { FrameType.Relic, "relic" },
+        };
+
+        private static readonly Dictionary<FrameType, Color> tooltipColorMap = new Dictionary<FrameType, Color>
+        {
+            { FrameType.Normal, System.Windows.Media.Color.FromRgb(0xc8, 0xc8, 0xc8) },
+            { FrameType.Rare, System.Windows.Media.Color.FromRgb(0xff, 0xff, 0x77) },
+            { FrameType.Magic, System.Windows.Media.Color.FromRgb(0x88, 0x88, 0xff) },
+            { FrameType.Gem, System.Windows.Media.Color.FromRgb(0x1b, 0xa2, 0x9b) },
+            { FrameType.Currency, System.Windows.Media.Color.FromRgb(0xaa, 0x9e, 0x82) },
+            { FrameType.Unique, System.Windows.Media.Color.FromRgb(0xaf, 0x60, 0x25) },
+            { FrameType.QuestItem, System.Windows.Media.Color.FromRgb(0x4a, 0xe6, 0x3a) },
+            { FrameType.Prophecy, System.Windows.Media.Color.FromRgb(0xb5, 0x4b, 0xff) },
+            { FrameType.Relic, System.Windows.Media.Color.FromRgb(0x82, 0xad, 0x6a) },
+        };
+
+        public SolidColorBrush TooltipColor
+        {
+            get
+            {
+                return new SolidColorBrush(tooltipColorMap[FrameType]);
+            }
+        }
+
         private TooltipImages tooltipImages;
         public TooltipImages TooltipImages
         {
@@ -351,19 +386,6 @@ namespace PoEStashSorterModels
             {
                 if (tooltipImages == null)
                 {
-                    var frameTypeMap = new Dictionary<FrameType, string>
-                    {
-                        { FrameType.Normal, "normal" },
-                        { FrameType.Magic, "magic" },
-                        { FrameType.Rare, "rare" },
-                        { FrameType.Unique, "unique" },
-                        { FrameType.Gem, "gem" },
-                        { FrameType.Currency, "currency" },
-                        { FrameType.DivinationCard, "normal" },
-                        { FrameType.QuestItem, "quest" },
-                        { FrameType.Prophecy, "prophecy" },
-                        { FrameType.Relic, "relic" },
-                    };
                     //single: 29x34
                     //double: 44x54
                     string headerFmtUrl = "https://web.poecdn.com/image/item/popup/header-{0}{1}-{2}.png";
