@@ -12,6 +12,6 @@
     <StackPanel>
         <Image x:Name="Separator" Height="8" Source="Images/seperator-rare.png"/>
         <!--<Image x:Name="Separator" Height="8" Source="Images/seperator-rare.png" Visibility="{Binding ShowSeparator, Converter={StaticResource BooleanToVisibilityConverter}}"/>-->
-        <TextBlock x:Name="Body" HorizontalAlignment="Center" Margin="0" TextWrapping="Wrap" Foreground="#FF7F7F7F" VerticalAlignment="Top" TextAlignment="Center" FontSize="14"><Run Text="Requires Level"/><Run Text=" "/><Run FontWeight="Bold" Text="69"/><Run Text=","/><Run Text=" "/><Run Foreground="Blue" FontWeight="Bold" Text="420"/><Run Text=" "/><Run Text="Str, "/><Run FontWeight="Bold" Text="120"/><Run Text=" Dex"/></TextBlock>
+        <TextBlock x:Name="Body" HorizontalAlignment="Center" Margin="0" TextWrapping="Wrap"  VerticalAlignment="Top" TextAlignment="Center" FontSize="14"><Run Text="Requires Level"/><Run Text=" "/><Run FontWeight="Bold" Text="69"/><Run Text=","/><Run Text=" "/><Run Foreground="Blue" FontWeight="Bold" Text="420"/><Run Text=" "/><Run Text="Str, "/><Run FontWeight="Bold" Text="120"/><Run Text=" Dex"/></TextBlock>
     </StackPanel>
 </UserControl>

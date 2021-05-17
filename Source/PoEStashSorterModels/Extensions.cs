@@ -32,6 +32,7 @@ namespace PoEStashSorterModels.ExtensionMethods
                 first = false;
             }
         }
+
         public static IEnumerable<T> Intersperse<T>(this IEnumerable<T> source, Func<T> elementCallback)
         {
             bool first = true;

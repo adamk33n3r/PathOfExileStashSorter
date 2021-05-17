@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PoEStashSorter"
              DataContext="{Binding RelativeSource={RelativeSource self}}"
-             mc:Ignorable="d" FontFamily="{DynamicResource DefaultFont}">
+             mc:Ignorable="d" FontFamily="{DynamicResource DefaultFont}" Foreground="#FF7F7F7F">
     <StackPanel x:Name="tooltipPanel" HorizontalAlignment="Left" VerticalAlignment="Top" Width="375" Margin="0" MinHeight="34">
         <StackPanel.Background>
             <SolidColorBrush Color="#000000" Opacity="0.8"/>
