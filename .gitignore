@@ -20,3 +20,5 @@
 /Source/PoEStashSorterModels/bin/Release/PoEStashSorterModels.pdb
 /Source/PoEStashSorterModels/bin
 /Source/PoEStashSorterModels/bin/x86
+*.zip
+*.7z

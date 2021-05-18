@@ -13,5 +13,12 @@
         <Image x:Name="Separator" Height="8" Source="Images/seperator-rare.png"/>
         <!--<Image x:Name="Separator" Height="8" Source="Images/seperator-rare.png" Visibility="{Binding ShowSeparator, Converter={StaticResource BooleanToVisibilityConverter}}"/>-->
         <TextBlock x:Name="Body" HorizontalAlignment="Center" TextWrapping="Wrap"  VerticalAlignment="Top" TextAlignment="Center" FontSize="14" Padding="5,0"><Run Text="Requires Level"/><Run Text=" "/><Run FontWeight="Bold" Text="69"/><Run Text=","/><Run Text=" "/><Run Foreground="Blue" FontWeight="Bold" Text="420"/><Run Text=" "/><Run Text="Str, "/><Run FontWeight="Bold" Text="120"/><Run Text=" Dex"/></TextBlock>
+        <StackPanel x:Name="ProgressBar" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Grid Width="212" Height="13">
+                <Image x:Name="ProgressBarBg" Source="Images/experience-bar.png" />
+                <Image x:Name="ProgressBarFill" Source="Images/experience-bar-fill.png" Stretch="Fill" MaxWidth="204" Width="50" HorizontalAlignment="Left" Margin="4,0,0,0" />
+            </Grid>
+            <TextBlock x:Name="ProgressBarValue" Text="999/2323" Margin="5,0,0,0" FontSize="14"></TextBlock>
+        </StackPanel>
     </StackPanel>
 </UserControl>

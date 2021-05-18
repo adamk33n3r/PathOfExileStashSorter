@@ -84,7 +84,7 @@ namespace PoEStashSorter
             // Properties
             PropRow.Visibility = item.Properties.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
             PropRow.ShowSeparator = false;
-            PropRow.Text.Clear();
+            PropRow.Clear();
             var propList = new List<List<Inline>>();
             foreach (var prop in item.Properties)
             {
@@ -126,7 +126,7 @@ namespace PoEStashSorter
 
             // Utility Mods (no sep)
             UtilityMods.ShowSeparator = false;
-            UtilityMods.Text.Clear();
+            UtilityMods.Clear();
             foreach (var mod in item.UtilityMods)
             {
                 if (UtilityMods.Text.Count > 0)
@@ -138,7 +138,7 @@ namespace PoEStashSorter
 
             // Requirements
             ReqRow.ShowSeparator = PropRow.Visibility == Visibility.Visible || UtilityMods.Visibility == Visibility.Visible;
-            ReqRow.Text.Clear();
+            ReqRow.Clear();
 
             var reqList = new List<List<Inline>>();
             foreach (var req in item.Requirements)
@@ -179,14 +179,14 @@ namespace PoEStashSorter
             ReqRow.Text.Add(new Run("Requires ")).AddRange(reqList.Intersperse(() => new List<Inline>{new Run(", ")}).SelectMany(x => x));
 
             SecondDescription.Foreground = item.TooltipColor;
-            SecondDescription.Text.Clear();
+            SecondDescription.Clear();
             if (!string.IsNullOrEmpty(item.SecDescrText))
             {
                 SecondDescription.Text += item.SecDescrText;
             }
 
             // Implicit Mods
-            ImplicitMods.Text.Clear();
+            ImplicitMods.Clear();
             foreach (var mod in item.ImplicitMods)
             {
                 if (ImplicitMods.Text.Count > 0)
@@ -197,7 +197,7 @@ namespace PoEStashSorter
             }
 
             // Explicit Mods
-            ExplicitMods.Text.Clear();
+            ExplicitMods.Clear();
             foreach (var mod in item.ExplicitMods)
             {
                 if (ExplicitMods.Text.Count > 0)
@@ -208,14 +208,17 @@ namespace PoEStashSorter
             }
 
             // Experience
-            Experience.Text.Clear();
+            Experience.Clear();
+            // Currently only supports 1 additional property (xp) but that's all I've seen so far
             if (item.AdditionalProperties.Count > 0)
             {
-                Experience.Text += string.Format("{0} ({1})", item.AdditionalProperties[0].Values[0].Value, item.AdditionalProperties[0].Progress);
+                Experience.Progress = item.AdditionalProperties[0].Progress;
+                Experience.ProgressText.Clear();
+                Experience.ProgressText += new Run(item.AdditionalProperties[0].Values[0].Value) { Foreground = new SolidColorBrush(Colors[item.AdditionalProperties[0].Values[0].ValueType]) };
             }
 
             // Description
-            Description.Text.Clear();
+            Description.Clear();
             if (item.DescrText != null)
             {
                 Description.Text += new Run(item.DescrText) { FontStyle = FontStyles.Italic };

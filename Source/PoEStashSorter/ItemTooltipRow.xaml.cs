@@ -40,12 +40,45 @@ namespace PoEStashSorter
         private TextCollection text;
         public TextCollection Text
         {
-            get => text;
+            get => this.text;
             set
             {
                 this.text = value;
-                Visibility = this.text.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+                SetVisibility();
             }
+        }
+
+        private double? progress;
+        public double? Progress
+        {
+            get => this.progress;
+            set
+            {
+                this.progress = value;
+                if (this.progress.HasValue)
+                {
+                    ProgressBarFill.Width = this.progress.Value * 204.0;
+                }
+                SetVisibility();
+            }
+        }
+        private TextCollection progressText;
+        public TextCollection ProgressText
+        {
+            get => this.progressText;
+            set
+            {
+                this.progressText = value;
+                SetVisibility();
+            }
+        }
+
+        private void SetVisibility()
+        {
+            bool isProgressVisible = this.progress.HasValue && this.progressText.Count > 0;
+            ProgressBar.Visibility = isProgressVisible ? Visibility.Visible : Visibility.Collapsed;
+            Body.Visibility = this.text.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+            Visibility = (this.text.Count > 0 || isProgressVisible) ? Visibility.Visible : Visibility.Collapsed;
         }
 
         public ItemTooltipRow()
@@ -54,7 +87,11 @@ namespace PoEStashSorter
             DataContext = this;
             this.text = new TextCollection(Body.Inlines);
             this.text.ContentChanged += () => {
-                Visibility = this.text.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+                SetVisibility();
+            };
+            this.progressText = new TextCollection(ProgressBarValue.Inlines);
+            this.progressText.ContentChanged += () => {
+                SetVisibility();
             };
             //Body.Inlines.Clear();
             //Body.Inlines.Add(new Run("Requires Level "));
@@ -62,6 +99,12 @@ namespace PoEStashSorter
             //Body.Inlines.Add(new Run(", "));
             //Body.Inlines.Add(new Run("420 ") { FontWeight = FontWeights.Bold, Foreground = new SolidColorBrush(Color.FromRgb(0xff, 0xff, 0xff)) });
             //Body.Inlines.Add(new Run("Str"));
+        }
+
+        public void Clear()
+        {
+            Text.Clear();
+            ProgressText.Clear();
         }
     }
 }

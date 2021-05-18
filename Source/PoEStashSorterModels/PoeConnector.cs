@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using PoEStashSorterModels.Exceptions;
 using PoEStashSorterModels.Servers;
+using System.IO;
 
 namespace PoEStashSorterModels
 {
@@ -75,15 +76,26 @@ namespace PoEStashSorterModels
             string jsonData = await server.WebClient.DownloadStringTaskAsync(
                 new Uri(string.Format(server.StashUrl, accountName, league.Name, tabIndex)));
 
-            System.IO.File.WriteAllText(string.Format(
-                $"get-stash-items.accountName-{{0}}_league-{{1}}_tab-{{2}}.json",
-                accountName,
-                league.Name,
-                tabIndex
-            ), jsonData);
-
             Stash stash = JsonConvert.DeserializeObject<Stash>(jsonData);
             Tab tab = stash.Tabs.FirstOrDefault(x => x.Index == tabIndex);
+
+            using (var stringReader = new StringReader(jsonData))
+            using (var stringWriter = new StringWriter())
+            {
+                using (var jsonReader = new JsonTextReader(stringReader))
+                using (var jsonWriter = new JsonTextWriter(stringWriter) { Formatting = Formatting.Indented })
+                {
+                    jsonWriter.WriteToken(jsonReader);
+                    File.WriteAllText(string.Format(
+                        $"_stash.{{0}}.{{1}}.tab-{{2}}.{{3}}.json",
+                        accountName,
+                        league.Name,
+                        tab.Name,
+                        tab.ID
+                    ), stringWriter.ToString());
+                }
+            }
+
             tab.Items = stash.Items;
             return tab;
         }

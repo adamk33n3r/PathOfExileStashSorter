@@ -222,6 +222,8 @@
     </Resource>
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Images\experience-bar-fill.png" />
+    <Resource Include="Images\experience-bar.png" />
     <Resource Include="Images\Seperator.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
