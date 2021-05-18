@@ -27,7 +27,7 @@ namespace PoEStashSorterModels
                                 instance = Serializer.Deserialize<Settings>(file);
                                 file.Close();
                             }
-                            catch (Exception ex)
+                            catch
                             {
                                 file.Close();
                                 instance = new Settings();

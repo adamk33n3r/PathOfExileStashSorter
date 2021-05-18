@@ -21,14 +21,37 @@ using System.Windows.Threading;
 
 namespace PoEStashSorterModels
 {
+    class ValueDataConverter : JsonConverter
+    {
+        public override bool CanConvert(Type objectType)
+        {
+            return objectType == typeof(ValueData);
+        }
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        {
+            JToken valueData = JToken.Load(reader);
+            return new ValueData { Value = valueData[0].ToObject<string>(), ValueType = valueData[1].ToObject<int>() };
+        }
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    public struct ValueData
+    {
+        public string Value;
+        public int ValueType;
+    }
     [DataContract]
     public class Property
     {
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
 
-        [JsonProperty(PropertyName = "values")]
-        public List<List<object>> Values { get; set; }
+        [JsonProperty(PropertyName = "values", ItemConverterType = typeof(ValueDataConverter))]
+        public List<ValueData> Values { get; set; }
 
         [JsonProperty(PropertyName = "displayMode")]
         public DisplayMode DisplayMode { get; set; }
@@ -40,8 +63,8 @@ namespace PoEStashSorterModels
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
 
-        [JsonProperty(PropertyName = "values")]
-        public List<List<object>> Values { get; set; }
+        [JsonProperty(PropertyName = "values", ItemConverterType = typeof(ValueDataConverter))]
+        public List<ValueData> Values { get; set; }
 
         [JsonProperty(PropertyName = "displayMode")]
         public int DisplayMode { get; set; }
@@ -77,8 +100,8 @@ namespace PoEStashSorterModels
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
 
-        [JsonProperty(PropertyName = "values")]
-        public List<List<object>> Values { get; set; }
+        [JsonProperty(PropertyName = "values", ItemConverterType = typeof(ValueDataConverter))]
+        public List<ValueData> Values { get; set; }
 
         [JsonProperty(PropertyName = "displayMode")]
         public DisplayMode DisplayMode { get; set; }
@@ -161,7 +184,7 @@ namespace PoEStashSorterModels
                 {
                     Requirement topRequirement = Requirements
                                     .Where(x => x.Name.ToLower() == "dex" || x.Name.ToLower() == "str" || x.Name.ToLower() == "int")
-                                    .OrderByDescending(x => x.Values.Select(c => Convert.ToInt32(c.Max(v => Convert.ToInt32(v)))).Max())
+                                    .OrderByDescending(x => x.Values.Select(c => Convert.ToInt32(c.Value)).Max())
                                     .FirstOrDefault();
 
                     if (topRequirement != null)
@@ -633,7 +656,7 @@ namespace PoEStashSorterModels
                     var lvlReq = this.Requirements.FirstOrDefault(x => x.Name == "Level");
                     if (lvlReq != null)
                     {
-                        return lvlReq.Values.Max(x => Convert.ToInt32(x.Max(c => Convert.ToInt32(c))));
+                        return lvlReq.Values.Max(x => Convert.ToInt32(x.Value));
                     }
                 }
 
@@ -695,10 +718,10 @@ namespace PoEStashSorterModels
             {
                 if (this.Properties != null)
                 {
-                    var lvlReq = this.Properties.FirstOrDefault(x => x.Name == "Quality");
-                    if (lvlReq != null)
+                    var quality = this.Properties.FirstOrDefault(x => x.Name == "Quality");
+                    if (quality != null)
                     {
-                        return lvlReq.Values.Max(x => Convert.ToInt32(x[0].ToString().Replace("+", "").Replace("%", "").Replace("-", "")));
+                        return quality.Values.Max(x => Convert.ToInt32(x.Value.Replace("+", "").Replace("%", "").Replace("-", "")));
                     }
                 }
 
@@ -717,7 +740,7 @@ namespace PoEStashSorterModels
                     {
                         var taa = Properties
                             .FirstOrDefault(x => Regex.IsMatch(x.Name, "map tier|map level|level",RegexOptions.IgnoreCase));
-                        level = taa?.Values.Max(x => Convert.ToInt32(x.Max(c => Convert.ToInt32(c))))??0;
+                        level = taa?.Values.Max(x => Convert.ToInt32(x.Value)) ?? 0;
                     }
                     catch (Exception)
                     {

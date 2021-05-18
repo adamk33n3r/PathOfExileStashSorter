@@ -77,7 +77,7 @@
             <Image x:Name="imgLeftStash" HorizontalAlignment="Left" Width="570" Source="Images/EmptyStash.png" Height="569" VerticalAlignment="Top" Margin="0,0,0,0"/>
             <Image x:Name="imgRightStash" HorizontalAlignment="Left" Width="570" Source="Images/EmptyStash.png" Height="569" VerticalAlignment="Top" Margin="617,0,0,0"/>
             <Popup x:Name="ItemTooltipPopup" AllowsTransparency="True">
-                <local:ItemTooltip x:Name="ItemTooltip" HorizontalAlignment="Left" VerticalAlignment="Top" Width="376"/>
+                <local:ItemTooltip x:Name="ItemTooltip" HorizontalAlignment="Left" VerticalAlignment="Top"/>
             </Popup>
         </Grid>
         <ComboBox x:Name="ddlLeague" HorizontalAlignment="Left" Margin="57,13,0,0" VerticalAlignment="Top" Width="170" SelectionChanged="ddlLeague_SelectionChanged"/>

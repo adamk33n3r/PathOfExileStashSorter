@@ -37,7 +37,6 @@ namespace PoEStashSorterModels
         private static Point startPos;
         private static float cellWidth;
         private static float cellHeight;
-        private static bool interrupt;
 
         public SortOption SortOption { get; set; }
 

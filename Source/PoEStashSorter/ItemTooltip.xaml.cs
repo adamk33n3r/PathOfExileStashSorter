@@ -3,17 +3,11 @@ using PoEStashSorterModels.ExtensionMethods;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using System.Text.RegularExpressions;
 
 namespace PoEStashSorter
 {
@@ -54,8 +48,6 @@ namespace PoEStashSorter
         {
             if (item == null)
             {
-                Visibility = Visibility.Hidden;
-                //Margin = new Thickness(-500, 0, 0, 0);
                 return;
             }
             Console.WriteLine("Opening tooltip for: {0}", item.FullItemName);
@@ -98,39 +90,35 @@ namespace PoEStashSorter
             {
                 var segment = new List<Inline>();
                 propList.Add(segment);
-                string sep = " ";
                 switch (prop.DisplayMode)
                 {
                     case DisplayMode.ColonSep:
-                        //sep = ": ";
-                        //goto case DisplayMode.SpaceSep;
                     {
                         segment.Add(new Run(prop.Name + (prop.Values.Count > 0 ? ": " : "")));
                         if (prop.Values.Count > 0)
                         {
-                            var color = Colors[Convert.ToInt32(prop.Values[0][1])];
-                            segment.Add(new Run(prop.Values[0][0] as string) { Foreground = new SolidColorBrush(color) });
+                            var color = Colors[Convert.ToInt32(prop.Values[0].ValueType)];
+                            segment.Add(new Run(prop.Values[0].Value) { Foreground = new SolidColorBrush(color) });
                         }
                         break;
                     }
                     case DisplayMode.SpaceSep:
-                        //string s = prop.Name;
-                        //if (prop.Values.Count > 0)
-                        //{
-                        //    s += sep + string.Join(", ", prop.Values.Select(v => v[0]));
-                        //}
                     {
-                        var color = Colors[Convert.ToInt32(prop.Values[0][1])];
-                        segment.Add(new Run(prop.Values[0][0] as string) { Foreground = new SolidColorBrush(color) });
+                        var color = Colors[Convert.ToInt32(prop.Values[0].ValueType)];
+                        segment.Add(new Run(prop.Values[0].Value) { Foreground = new SolidColorBrush(color) });
                         segment.Add(new Run(" " + prop.Name));
                         break;
                     }
                     case DisplayMode.Formatted:
-                        // Currently ignores display style
-                        segment.Add(new Run(string.Format(prop.Name, prop.Values.Select(v => v[0]).ToArray())));
+                        segment.AddRange(
+                            ParseFmt(new DisplayFormat() {
+                                fmt = prop.Name,
+                                values = prop.Values.Select(i => (i.Value, Colors[i.ValueType])).ToList(),
+                            })
+                        );
                         break;
                     case DisplayMode.Progress:
-                        segment.Add(new Run(string.Format("{0}: {1}", prop.Name, prop.Values[0][0])));
+                        segment.Add(new Run(string.Format("{0}: {1}", prop.Name, prop.Values[0].Value)));
                         break;
                 }
             }
@@ -162,23 +150,29 @@ namespace PoEStashSorter
                     case DisplayMode.ColonSep:
                     {
                         segment.Add(new Run(req.Name + " "));
-                        var color = Colors[Convert.ToInt32(req.Values[0][1])];
-                        segment.Add(new Run(req.Values[0][0] as string) { Foreground = new SolidColorBrush(color) });
+                        var color = Colors[req.Values[0].ValueType];
+                        segment.Add(new Run(req.Values[0].Value) { Foreground = new SolidColorBrush(color) });
                         break;
                     }
                     case DisplayMode.SpaceSep:
                     {
-                        var color = Colors[Convert.ToInt32(req.Values[0][1])];
-                        segment.Add(new Run(req.Values[0][0] as string) { Foreground = new SolidColorBrush(color) });
+                        var color = Colors[Convert.ToInt32(req.Values[0].ValueType)];
+                        segment.Add(new Run(req.Values[0].Value) { Foreground = new SolidColorBrush(color) });
                         segment.Add(new Run(" " + req.Name));
                         break;
                     }
                     case DisplayMode.Formatted:
-                        // Currently ignores display style
-                        segment.Add(new Run(string.Format(req.Name, req.Values.Select(v => v[0]).ToArray())));
+                        segment.AddRange(
+                            ParseFmt(new DisplayFormat() {
+                                fmt = req.Name,
+                                values = req.Values.Select(i => (i.Value, Colors[i.ValueType])).ToList(),
+                                //text = req.Values.Select(i => (string)i[0]).ToList(),
+                                //colors = req.Values.Select(i => Colors[(long)i[1]]).ToList(),
+                            })
+                        );
                         break;
                     case DisplayMode.Progress:
-                        segment.Add(new Run(string.Format("{0}: {1}", req.Name, req.Values[0][0])));
+                        segment.Add(new Run(string.Format("{0}: {1}", req.Name, req.Values[0].Value)));
                         break;
                 }
             }
@@ -217,7 +211,7 @@ namespace PoEStashSorter
             Experience.Text.Clear();
             if (item.AdditionalProperties.Count > 0)
             {
-                Experience.Text += string.Format("{0} ({1})", item.AdditionalProperties[0].Values[0][0], item.AdditionalProperties[0].Progress);
+                Experience.Text += string.Format("{0} ({1})", item.AdditionalProperties[0].Values[0].Value, item.AdditionalProperties[0].Progress);
             }
 
             // Description
@@ -229,8 +223,46 @@ namespace PoEStashSorter
 
             Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
             Arrange(new Rect(0, 0, DesiredSize.Width, DesiredSize.Height));
+        }
 
-            Visibility = Visibility.Visible;
+        struct DisplayFormat
+        {
+            public string fmt;
+            public List<(string, Color)> values;
+        }
+
+        struct FormatNode
+        {
+            public int idx;
+            public int length;
+            public int argIdx;
+        }
+
+        private static List<Inline> ParseFmt(DisplayFormat displayFormat)
+        {
+            var reg = new Regex(@"{(\d+)}");
+            var matches = reg.Matches(displayFormat.fmt);
+            var idxList = new List<FormatNode>();
+            foreach (Match match in matches)
+            {
+                Group fmtS = match.Groups[0];
+                Group fmtIdx = match.Groups[1];
+                int argIdx = Int32.Parse(fmtIdx.Value);
+                idxList.Add(new FormatNode { idx = fmtS.Index, length = fmtS.Length, argIdx = argIdx });
+            }
+
+            var inlines = new List<Inline>();
+            int pos = 0;
+            foreach (var (node, idx) in idxList.Select((i, idx) => (i, idx)))
+            {
+                // Text up until node
+                inlines.Add(new Run(displayFormat.fmt.Substring(pos, node.idx - pos)));
+                // Node text
+                inlines.Add(new Run(displayFormat.values[idx].Item1) { Foreground = new SolidColorBrush(displayFormat.values[idx].Item2) });
+                pos = node.idx + node.length;
+            }
+            inlines.Add(new Run(displayFormat.fmt.Substring(pos, displayFormat.fmt.Length - pos)));
+            return inlines;
         }
     }
 }

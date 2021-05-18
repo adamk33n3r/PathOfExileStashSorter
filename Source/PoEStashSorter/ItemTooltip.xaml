@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:PoEStashSorter"
              DataContext="{Binding RelativeSource={RelativeSource self}}"
              mc:Ignorable="d" FontFamily="{DynamicResource DefaultFont}" Foreground="#FF7F7F7F">
-    <StackPanel x:Name="tooltipPanel" HorizontalAlignment="Left" VerticalAlignment="Top" Width="375" Margin="0" MinHeight="34">
+    <StackPanel x:Name="tooltipPanel" HorizontalAlignment="Left" VerticalAlignment="Top" MaxWidth="400" Margin="0" MinHeight="34">
         <StackPanel.Background>
             <SolidColorBrush Color="#000000" Opacity="0.8"/>
         </StackPanel.Background>
@@ -14,8 +14,8 @@
             <Image x:Name="HeaderLeft" HorizontalAlignment="Left" VerticalAlignment="Top" Source="Images\header-double-rare-left.png" Stretch="None"/>
             <Image x:Name="HeaderMiddle" Margin="29,0,28,0" VerticalAlignment="Top" Source="Images\header-double-rare-middle.png" Stretch="Fill"/>
             <Image x:Name="HeaderRight" HorizontalAlignment="Right" VerticalAlignment="Top" Source="Images\header-double-rare-right.png" Stretch="None"/>
-            <Label x:Name="Name1" FontSize="19" FontWeight="Bold" Foreground="#C8C8C8" Content="War Axe" VerticalAlignment="Top" Margin="0,-2,0,0" HorizontalAlignment="Center"/>
-            <Label x:Name="Name2" FontSize="19" FontWeight="Bold" Foreground="#C8C8C8" Content="Item Name that is really long" VerticalAlignment="Top" Margin="52,22,53,0" HorizontalAlignment="Center"/>
+            <Label x:Name="Name1" FontSize="19" FontWeight="Bold" Foreground="#FFFF77" Content="War Axe" VerticalAlignment="Top" Margin="0,-2,0,0" HorizontalAlignment="Center"/>
+            <Label x:Name="Name2" FontSize="19" FontWeight="Bold" Foreground="#FFFF77" Content="Item Name that is really long" VerticalAlignment="Top" Margin="52,22,53,0" HorizontalAlignment="Center"/>
         </Grid>
         <StackPanel x:Name="Rows">
             <local:ItemTooltipRow x:Name="PropRow"></local:ItemTooltipRow>
