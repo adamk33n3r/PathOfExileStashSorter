@@ -38,8 +38,8 @@ namespace PoEStashSorterModels
                 } catch (Exceptions.DownloadFailedException ex)
                 {
                     Console.WriteLine(ex);
+                    throw ex;
                 }
-                catch { }
             }
 
             return fullIconPath;

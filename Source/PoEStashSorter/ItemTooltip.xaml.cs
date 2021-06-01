@@ -50,7 +50,7 @@ namespace PoEStashSorter
             {
                 return;
             }
-            Console.WriteLine("Opening tooltip for: {0}", item.FullItemName);
+            //Console.WriteLine("Opening tooltip for: {0}", item.FullItemName);
 
             /* SETUP */
 
