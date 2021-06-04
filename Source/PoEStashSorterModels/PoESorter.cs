@@ -219,15 +219,12 @@ namespace PoEStashSorterModels
         static Dictionary<Item, System.Windows.Input.MouseEventHandler> leaveEvents = new Dictionary<Item, System.Windows.Input.MouseEventHandler>();
         private static void SortTab(Tab tab)
         {
-            Console.WriteLine("called SortTab");
             if (init && tab.IsSelected)
             {
                 //Remove old sorted tab preview
                 if (SelectedTabSorted != null)
                 {
                     SelectedTabSorted.IsSelected = false;
-                    //SelectedTabSorted.Items.ForEach(x => ItemCanvas.Children.Remove(x.Image));
-                    Console.WriteLine("clearing children");
                     ItemCanvas.Children.Clear();
                 }
                 SelectedTabSorted = SelectedSortingAlgorithm.SortTab(tab);

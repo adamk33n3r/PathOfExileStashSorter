@@ -19,7 +19,7 @@ namespace PoEStashSorterModels.Servers
 
         protected virtual string SessionIdName => "POESESSID";
 
-        public virtual string CharacterUrl => $"http://{Domain}/character-window/get-characters?accountName={{0}}";
+        public virtual string CharacterUrl => $"https://{Domain}/character-window/get-characters?accountName={{0}}";
 
         protected virtual string MyAccountUrl => $"https://{Domain}/my-account";
 

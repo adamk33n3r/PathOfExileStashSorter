@@ -90,7 +90,7 @@ namespace PoEStashSorterModels
                         $"_stash.{{0}}.{{1}}.tab-{{2}}.{{3}}.json",
                         accountName,
                         league.Name,
-                        tab.Name,
+                        Uri.EscapeDataString(tab.Name),
                         tab.ID
                     ), stringWriter.ToString());
                 }
