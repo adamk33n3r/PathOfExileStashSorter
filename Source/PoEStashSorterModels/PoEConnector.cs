@@ -79,22 +79,22 @@ namespace PoEStashSorterModels
             Stash stash = JsonConvert.DeserializeObject<Stash>(jsonData);
             Tab tab = stash.Tabs.FirstOrDefault(x => x.Index == tabIndex);
 
-            using (var stringReader = new StringReader(jsonData))
-            using (var stringWriter = new StringWriter())
-            {
-                using (var jsonReader = new JsonTextReader(stringReader))
-                using (var jsonWriter = new JsonTextWriter(stringWriter) { Formatting = Formatting.Indented })
-                {
-                    jsonWriter.WriteToken(jsonReader);
-                    File.WriteAllText(string.Format(
-                        $"_stash.{{0}}.{{1}}.tab-{{2}}.{{3}}.json",
-                        accountName,
-                        league.Name,
-                        Uri.EscapeDataString(tab.Name),
-                        tab.ID
-                    ), stringWriter.ToString());
-                }
-            }
+            //using (var stringReader = new StringReader(jsonData))
+            //using (var stringWriter = new StringWriter())
+            //{
+            //    using (var jsonReader = new JsonTextReader(stringReader))
+            //    using (var jsonWriter = new JsonTextWriter(stringWriter) { Formatting = Formatting.Indented })
+            //    {
+            //        jsonWriter.WriteToken(jsonReader);
+            //        File.WriteAllText(string.Format(
+            //            $"_stash.{{0}}.{{1}}.tab-{{2}}.{{3}}.json",
+            //            accountName,
+            //            league.Name,
+            //            Uri.EscapeDataString(tab.Name),
+            //            tab.ID
+            //        ), stringWriter.ToString());
+            //    }
+            //}
 
             tab.Items = stash.Items;
             return tab;
